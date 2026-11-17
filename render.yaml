@@ -1,0 +1,39 @@
+# Despliegue de PISAC en Render (https://render.com)
+# Sube este repositorio a GitHub y luego, en Render, elige
+# "New > Blueprint" y apunta al repositorio. Render leerá este archivo.
+services:
+  - type: web
+    name: pisac
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Genera automaticamente una clave secreta para los tokens de sesion
+      - key: JWT_SECRET
+        generateValue: true
+      # Pega aqui el Client ID de Google Cloud para activar
+      # "Iniciar sesion con Google". Dejalo vacio para desactivarlo.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      # IMPORTANTE: cambia esto por la URL publica que te asigne Render,
+      # por ejemplo https://pisac.onrender.com
+      - key: BASE_URL
+        sync: false
+      - key: NOTA_MAXIMA
+        value: "100"
+      - key: NOTA_APROBATORIA
+        value: "51"
+      - key: NIVEL_BUENO
+        value: "71"
+      - key: NIVEL_EXCELENTE
+        value: "91"
+      - key: ADMIN_NOMBRE
+        value: Prof. Administrador
+      - key: ADMIN_EMAIL
+        value: admin@pisac.edu
+      # Cambia la contrasena del administrador antes de usarlo en produccion
+      - key: ADMIN_PASSWORD
+        sync: false

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PISAC · Seguimiento académico</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="seguimiento">
+    <div id="cargando" class="cargando">
+      <p>Cargando el reporte académico…</p>
+    </div>
+
+    <div id="error" class="error-caja oculto">
+      <h2>No se pudo abrir el reporte</h2>
+      <p id="error-texto">El enlace no es válido o ha expirado.</p>
+    </div>
+
+    <div id="reporte" class="oculto">
+      <header class="seg-header">
+        <div class="marca">PISAC</div>
+        <h1 id="titulo-estudiante">—</h1>
+        <p id="subtitulo-tutor">—</p>
+        <span class="curso" id="curso-estudiante">—</span>
+      </header>
+
+      <div id="aviso"></div>
+
+      <div id="mensaje-profesor" class="mensaje-prof oculto"></div>
+
+      <div class="tarjetas" id="tarjetas"></div>
+      <div class="escala-leyenda" id="leyenda"></div>
+
+      <div class="panel">
+        <h2>Rendimiento por materia</h2>
+        <p class="subtitulo">Promedio de calificaciones agrupadas por asignatura.</p>
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>Materia</th><th>Promedio</th><th>Progreso</th><th>Registros</th><th>Estado</th></tr></thead>
+            <tbody id="tabla-materias"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Notas detalladas</h2>
+        <p class="subtitulo">Todas las calificaciones registradas.</p>
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>Materia</th><th>Periodo</th><th>Nota</th><th>Nivel</th><th>Fecha</th><th>Observación</th></tr></thead>
+            <tbody id="tabla-notas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Tareas</h2>
+        <p class="subtitulo">Estado de los trabajos y deberes.</p>
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>Materia</th><th>Título</th><th>Entrega</th><th>Estado</th><th>Nota</th></tr></thead>
+            <tbody id="tabla-tareas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Exámenes</h2>
+        <p class="subtitulo">Resultados de pruebas y evaluaciones.</p>
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>Materia</th><th>Título</th><th>Fecha</th><th>Nota</th></tr></thead>
+            <tbody id="tabla-examenes"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Asistencia</h2>
+        <p class="subtitulo">Registro de días asistidos a clases.</p>
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Estado</th><th>Observación</th></tr></thead>
+            <tbody id="tabla-asistencia"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <p style="text-align:center;color:var(--gris-500);font-size:12px;margin-top:24px;">
+        PISAC · Plataforma de Interacción y Seguimiento Académico
+      </p>
+    </div>
+  </div>
+
+  <script src="/js/seguimiento.js"></script>
+</body>
+</html>

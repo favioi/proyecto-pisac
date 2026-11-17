@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#05080f" />
+  <title>PISAC · Acceso del profesor</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <section class="login-marca">
+      <div class="login-logo">PISA<span>C</span></div>
+      <h1>Plataforma de Interacción y Seguimiento Académico</h1>
+      <p>Notifica a los tutores el rendimiento académico de sus representados: notas por materia, tareas, exámenes y asistencia, con un enlace directo por WhatsApp.</p>
+      <ul>
+        <li>Registro de notas, tareas y exámenes</li>
+        <li>Control de asistencia diaria</li>
+        <li>Reporte detallado para el tutor</li>
+        <li>Notificación por WhatsApp en un clic</li>
+      </ul>
+    </section>
+
+    <section class="login-form">
+      <div class="login-card">
+        <div class="marca-mini">PISA<span>C</span></div>
+        <h2>Acceso docente</h2>
+        <p>Entra al panel para registrar y enviar el seguimiento académico.</p>
+
+        <!-- Acceso directo desde esta computadora -->
+        <div id="bloque-local" class="oculto">
+          <button id="btn-entrar-local" class="btn btn-block">Entrar al panel</button>
+          <p class="login-nota" id="local-nota">Acceso directo en este equipo. No necesitas cuenta.</p>
+        </div>
+
+        <!-- Botón de Google -->
+        <div id="bloque-google" class="oculto">
+          <div id="boton-google" class="google-caja"></div>
+          <p class="login-nota">Entra con tu cuenta de Google. Si es tu primera vez, se crea automáticamente.</p>
+        </div>
+
+        <!-- Conectar Google (opcional) -->
+        <details id="bloque-config" class="login-pasos oculto">
+          <summary id="config-summary">Conectar Google (opcional)</summary>
+
+          <div class="campo" style="margin-top:11px">
+            <label for="client-id">Client ID de Google</label>
+            <input id="client-id" placeholder="1234567890-xxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false" />
+          </div>
+          <button id="btn-guardar-client-id" class="btn btn-block">Guardar y activar Google</button>
+
+          <ol style="margin-top:12px">
+            <li>Entra a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">console.cloud.google.com</a> con tu cuenta de Google.</li>
+            <li>Crea un proyecto llamado <code>PISAC</code>.</li>
+            <li>En <em>Pantalla de consentimiento de OAuth</em> elige tipo <strong>Externo</strong> y agrega tu correo en <em>Usuarios de prueba</em>.</li>
+            <li>En <em>Credenciales</em> → <em>Crear</em> → <em>ID de cliente de OAuth</em>, elige tipo <strong>Aplicación web</strong>.</li>
+            <li>En <em>Orígenes de JavaScript autorizados</em> agrega <code class="origen-sugerido">http://localhost:3000</code></li>
+            <li>Copia el <strong>Client ID</strong> (termina en <code>.apps.googleusercontent.com</code>) y pégalo arriba.</li>
+          </ol>
+          <p style="margin:6px 0 0">Guía completa en <strong>GUIA-GOOGLE.md</strong>, dentro de la carpeta del proyecto.</p>
+        </details>
+
+        <div id="mensaje-error" class="oculto" style="margin-top:14px;color:#ff9b9b;font-size:13px;line-height:1.5"></div>
+
+        <p style="margin-top:22px;font-size:11.5px;color:var(--gris-500);text-align:center">
+          PISAC · Plataforma de Interacción y Seguimiento Académico
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const KEY_TOKEN = 'pisac_token';
+    const KEY_PROF = 'pisac_profesor';
+
+    function obtenerToken() {
+      return localStorage.getItem(KEY_TOKEN) || sessionStorage.getItem(KEY_TOKEN);
+    }
+    function guardarSesion(token, profesor) {
+      localStorage.setItem(KEY_TOKEN, token);
+      localStorage.setItem(KEY_PROF, JSON.stringify(profesor));
+    }
+    function limpiarSesion() {
+      [localStorage, sessionStorage].forEach((s) => {
+        s.removeItem(KEY_TOKEN);
+        s.removeItem(KEY_PROF);
+      });
+    }
+
+    const error = document.getElementById('mensaje-error');
+    function mostrarError(msg) {
+      error.textContent = msg;
+      error.classList.remove('oculto');
+    }
+    function ocultarError() {
+      error.classList.add('oculto');
+      error.textContent = '';
+    }
+
+    // ------------------------------------------------------------------
+    // Si ya hay una sesión guardada y sigue siendo válida, entra directo.
+    // ------------------------------------------------------------------
+    async function revisarSesionGuardada() {
+      const t = obtenerToken();
+      if (!t) return false;
+      try {
+        const r = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + t } });
+        if (!r.ok) throw new Error();
+        window.location.href = '/profesor.html';
+        return true;
+      } catch (e) {
+        limpiarSesion();
+        return false;
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // Acceso directo (solo en esta computadora)
+    // ------------------------------------------------------------------
+    function mostrarAccesoLocal(secundario) {
+      const bloque = document.getElementById('bloque-local');
+      const boton = document.getElementById('btn-entrar-local');
+      const nota = document.getElementById('local-nota');
+      bloque.classList.remove('oculto');
+
+      if (secundario) {
+        boton.className = 'btn btn-sec btn-block';
+        boton.textContent = 'Entrar con la cuenta de este equipo';
+        nota.textContent = 'Acceso directo solo desde esta computadora.';
+      } else {
+        boton.className = 'btn btn-block';
+        boton.textContent = 'Entrar al panel';
+        nota.textContent = 'Acceso directo, sin cuenta. Solo desde este equipo.';
+      }
+
+      boton.addEventListener('click', async () => {
+        ocultarError();
+        boton.disabled = true;
+        const original = boton.textContent;
+        boton.textContent = 'Entrando…';
+        try {
+          const resp = await fetch('/api/auth/local', { method: 'POST' });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || 'No se pudo entrar.');
+          guardarSesion(data.token, data.profesor);
+          window.location.href = '/profesor.html';
+        } catch (err) {
+          mostrarError(err.message);
+          boton.disabled = false;
+          boton.textContent = original;
+        }
+      });
+    }
+
+    // ------------------------------------------------------------------
+    // Google Identity Services
+    // ------------------------------------------------------------------
+    function cargarGIS() {
+      return new Promise((resolve, reject) => {
+        if (window.google && window.google.accounts) return resolve();
+        const s = document.createElement('script');
+        s.src = 'https://accounts.google.com/gsi/client';
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('No se pudo cargar Google.'));
+        document.head.appendChild(s);
+        setTimeout(() => reject(new Error('Google tardó demasiado en cargar.')), 12000);
+      });
+    }
+
+    async function manejarCredencialGoogle(response) {
+      ocultarError();
+      try {
+        const resp = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'No se pudo iniciar sesión.');
+        guardarSesion(data.token, data.profesor);
+        window.location.href = '/profesor.html';
+      } catch (err) {
+        mostrarError(err.message);
+      }
+    }
+
+    async function iniciarAccesoGoogle(clientId) {
+      const bloque = document.getElementById('bloque-google');
+      bloque.classList.remove('oculto');
+      try {
+        await cargarGIS();
+      } catch (e) {
+        bloque.classList.add('oculto');
+        mostrarError('No se pudo cargar Google. Puedes entrar con el botón de abajo.');
+        return;
+      }
+      try {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: manejarCredencialGoogle,
+          auto_select: true,
+          cancel_on_tap_outside: false
+        });
+        google.accounts.id.renderButton(document.getElementById('boton-google'), {
+          type: 'standard',
+          theme: 'filled_blue',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          width: Math.min(320, Math.max(200, window.innerWidth - 140)),
+          locale: 'es'
+        });
+        google.accounts.id.prompt();
+      } catch (e) {
+        document.getElementById('boton-google').innerHTML =
+          '<a class="btn" href="" onclick="location.reload();return false;">Reintentar carga de Google</a>';
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // Asistente: guardar el Client ID desde la interfaz
+    // ------------------------------------------------------------------
+    function iniciarAsistenteGoogle(textoResumen) {
+      const bloque = document.getElementById('bloque-config');
+      bloque.classList.remove('oculto');
+      if (textoResumen) document.getElementById('config-summary').textContent = textoResumen;
+
+      const input = document.getElementById('client-id');
+      const boton = document.getElementById('btn-guardar-client-id');
+
+      boton.addEventListener('click', async () => {
+        ocultarError();
+        const valor = input.value.trim();
+        if (!valor) {
+          mostrarError('Pega el Client ID de Google para continuar.');
+          return;
+        }
+        if (!/\.apps\.googleusercontent\.com$/.test(valor)) {
+          mostrarError('Ese Client ID no parece válido: debe terminar en .apps.googleusercontent.com');
+          return;
+        }
+        boton.disabled = true;
+        boton.textContent = 'Guardando…';
+        try {
+          const resp = await fetch('/api/config/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ googleClientId: valor })
+          });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || 'No se pudo guardar el Client ID.');
+          boton.textContent = 'Google activado ✓';
+          window.location.reload();
+        } catch (err) {
+          mostrarError(err.message);
+          boton.disabled = false;
+          boton.textContent = 'Guardar y activar Google';
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') boton.click();
+      });
+    }
+
+    // ------------------------------------------------------------------
+    // Arranque
+    // ------------------------------------------------------------------
+    (async function arrancar() {
+      if (await revisarSesionGuardada()) return;
+      document.querySelectorAll('.origen-sugerido').forEach((el) => (el.textContent = window.location.origin));
+
+      let cfg;
+      try {
+        cfg = await fetch('/api/config').then((r) => r.json());
+      } catch (e) {
+        mostrarError('No se pudo conectar con el servidor. Verifica que la aplicación esté encendida.');
+        return;
+      }
+
+      if (cfg.googleClientId) {
+        await iniciarAccesoGoogle(cfg.googleClientId);
+        if (cfg.accesoLocal) mostrarAccesoLocal(true);
+        iniciarAsistenteGoogle('Cambiar el Client ID de Google');
+      } else if (cfg.accesoLocal) {
+        mostrarAccesoLocal(false);
+        iniciarAsistenteGoogle('Conectar Google (opcional)');
+      } else {
+        iniciarAsistenteGoogle('Conectar Google para entrar');
+        mostrarError('Esta aplicación todavía no tiene el acceso con Google configurado.');
+      }
+    })();
+  </script>
+</body>
+</html>

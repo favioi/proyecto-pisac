@@ -1,0 +1,160 @@
+PISAC - Como empezar
+=====================
+
+CONTENIDO
+---------
+  pisac/                  Aplicacion completa (Node.js + Express + SQLite)
+  pisac/INICIAR-PISAC.bat Archivo para abrir la app con DOBLE CLIC (Windows)
+  pisac/REPARAR-PISAC.bat Si algo falla, este archivo lo repara solo
+  plantillas/             Plantillas para cargar estudiantes, materias y notas
+  pisac-demo.html         Version de un solo archivo (doble clic, sin instalar)
+  LEEME.txt               Este archivo
+  CORRECCIONES.md         Lista de fallos corregidos y como se probaron
+  GUIA-GOOGLE.md          Paso a paso para conectar el acceso con Google
+  COMO-EDITAR.md          Guia para abrir el proyecto en VS Code y modificarlo
+
+
+FORMA FACIL - DOBLE CLIC (Windows)
+----------------------------------
+Entra a la carpeta  pisac  y haz DOBLE CLIC en:
+
+    INICIAR-PISAC.bat
+
+Eso hace todo solo: instala lo que falte, arranca el servidor y abre
+el navegador en http://localhost:3000
+
+Para CERRAR la aplicacion: cierra la ventana negra que se abre.
+
+Si quieres, puedes crear un acceso directo en el Escritorio:
+   clic derecho sobre INICIAR-PISAC.bat  >  Enviar a  >  Escritorio
+
+
+FORMA MANUAL (si el doble clic no funciona)
+-------------------------------------------
+Abre una terminal dentro de la carpeta  pisac  y escribe:
+
+    npm install
+    npm start
+
+Necesitas Node.js 20 o superior (recomendado: la LTS 22 de nodejs.org).
+
+
+SI SALE "npm ERR! code UNKNOWN" O "mkdir ... .staging"
+-----------------------------------------------------
+Casi siempre es por una de estas dos causas:
+
+  1) Tu Node.js es muy antiguo. PISAC necesita Node.js 20 o superior.
+     Comprueba la version escribiendo en una terminal:
+
+         node -v
+
+     Si dice v12, v14, v16 o v18: descarga la version LTS (22) desde
+     https://nodejs.org, instalala y cierra todas las ventanas.
+
+  2) La carpeta esta en un lugar con problemas (una USB, una carpeta
+     sincronizada, o una ruta con parentesis como "pisac (3)").
+     Copia la carpeta pisac a algo simple, por ejemplo:
+
+         C:\PISAC
+
+     y ejecuta ahi REPARAR-PISAC.bat
+
+  3) La unidad no tiene espacio libre suficiente (necesita ~200 MB).
+
+Si aun asi falla, prueba en una terminal dentro de la carpeta:
+
+     npm cache clean --force
+     npm install
+
+
+SI SALE "Cannot find module 'dotenv'" O PARECIDO
+-----------------------------------------------
+Significa que los componentes (node_modules) no estan instalados,
+se copiaron incompletos o la instalacion no termino.
+
+SOLUCION FACIL:
+  1. Cierra la ventana negra.
+  2. Haz DOBLE CLIC en:
+
+         REPARAR-PISAC.bat
+
+  3. Espera a que termine (instala todo de nuevo sin borrar tus datos).
+  4. Vuelve a abrir INICIAR-PISAC.bat
+
+SOLUCION MANUAL:
+  Abre una terminal dentro de la carpeta pisac y escribe:
+
+         npm install
+
+  Espera a que termine sin errores y vuelve a arrancar la app.
+
+Si el error dice "Falta package.json", es que el ZIP no se extrajo
+completo: extrae de nuevo el archivo .zip (no lo abras desde dentro
+del ZIP) y usa la carpeta  pisac.
+
+
+SI SALE UN ERROR DE better-sqlite3 / node-gyp / Python
+------------------------------------------------------
+    npm install better-sqlite3@13
+
+La version 13 trae los binarios incluidos y no pide permisos.
+
+
+COMPROBAR QUE TODO ESTE LISTO
+-----------------------------
+    npm run verificar
+
+
+COMO ENTRAR
+-----------
+Al abrir la app aparece el boton  "Entrar al panel": con eso ya puedes
+usar todo, sin cuenta ni contrasena. Ese acceso solo funciona en la
+computadora donde esta instalada la app.
+
+Google es OPCIONAL: si quieres entrar con tu cuenta de Google, configura
+el Client ID una sola vez (abajo se explica).
+
+Para conectar Google (opcional), la app te pide pegar tu Client ID:
+
+1. Ve a https://console.cloud.google.com con tu cuenta de Google
+2. Crea un proyecto llamado PISAC
+3. APIs y servicios > Pantalla de consentimiento de OAuth  (tipo: Externo)
+4. En "Usuarios de prueba" agrega TU correo de Gmail
+5. APIs y servicios > Credenciales > Crear > ID de cliente de OAuth
+   - Tipo: Aplicacion web
+   - Origenes de JavaScript autorizados:  http://localhost:3000
+6. Copia el Client ID (termina en .apps.googleusercontent.com)
+7. Pegalo en la pantalla de acceso de la app y pulsa "Guardar y activar
+   Google". Listo: no hay que editar ningun archivo.
+
+El paso a paso completo esta en  pisac/README.md y en GUIA-GOOGLE.md
+
+OJO: abre la app como http://localhost:3000 (no 127.0.0.1), porque Google
+solo acepta el origen exacto que autorizaste.
+
+
+ENVIAR EL ENLACE POR WHATSAPP
+-----------------------------
+El boton "Enviar por WhatsApp" abre WhatsApp con el mensaje y el enlace ya
+escritos; tu solo pulsas enviar.
+
+La direccion de los enlaces se elige sola:
+  - Si guardaste una direccion publica (tunel o Render), usa esa.
+  - Si no, usa la IP de tu red: el enlace abre en celulares conectados al
+    MISMO Wi-Fi que la computadora.
+  - Si abres el panel desde el tunel, usa la direccion del tunel.
+
+Para que funcione con datos moviles u otra red, pega una direccion publica
+en el panel > Ajustes > Direccion publica. Queda guardada y no se vuelve a
+pedir.
+
+En Windows, si aparece un aviso del Firewall la primera vez, permite el
+acceso en "Redes privadas" para que el celular pueda abrir el enlace.
+
+
+NIVELES DE CALIFICACION
+-----------------------
+  0 a 50   -> Insuficiente (en riesgo)
+  51 a 70  -> Regular
+  71 a 90  -> Bueno
+  91 a 100 -> Excelente

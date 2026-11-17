@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PISAC · Panel del profesor</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ---------------------------------------------------- Barra lateral -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <b>PISAC</b>
+        <small>Interacción y Seguimiento Académico</small>
+      </div>
+      <ul class="nav" id="nav">
+        <li><button data-vista="inicio" class="activo"><span class="icono">📊</span> Inicio</button></li>
+        <li><button data-vista="estudiantes"><span class="icono">🎓</span> Estudiantes</button></li>
+        <li><button data-vista="materias"><span class="icono">📚</span> Materias</button></li>
+        <li><button data-vista="notas"><span class="icono">📝</span> Notas</button></li>
+        <li><button data-vista="tareas"><span class="icono">📌</span> Tareas</button></li>
+        <li><button data-vista="examenes"><span class="icono">🧪</span> Exámenes</button></li>
+        <li><button data-vista="asistencia"><span class="icono">🗓️</span> Asistencia</button></li>
+        <li><button data-vista="notificaciones"><span class="icono">📲</span> Notificaciones</button></li>
+        <li><button data-vista="ajustes"><span class="icono">⚙️</span> Ajustes</button></li>
+      </ul>
+      <div class="sidebar-pie">
+        <div class="usuario-caja">
+          <img id="usuario-foto" class="usuario-foto oculto" alt="" />
+          <div class="usuario-datos">
+            <div class="usuario" id="usuario-nombre">—</div>
+            <div class="usuario-email" id="usuario-email"></div>
+          </div>
+        </div>
+        <button class="btn btn-sec btn-mini" id="btn-salir">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <!-- ------------------------------------------------------- Contenido -->
+    <main class="contenido">
+
+      <!-- INICIO -->
+      <section id="vista-inicio">
+        <div class="cabecera">
+          <div>
+            <h1>Panel de control</h1>
+            <p>Resumen general del seguimiento académico.</p>
+          </div>
+        </div>
+        <div class="tarjetas" id="tarjetas-resumen"></div>
+        <div class="panel">
+          <h2>Estudiantes con bajo rendimiento</h2>
+          <p class="subtitulo">Promedio general por debajo de la nota aprobatoria.</p>
+          <div class="tabla-wrap">
+            <table>
+              <thead>
+                <tr><th>Estudiante</th><th>Curso</th><th>Promedio</th><th>Tutor</th><th>Estado</th></tr>
+              </thead>
+              <tbody id="tabla-riesgo"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ESTUDIANTES -->
+      <section id="vista-estudiantes" class="oculto">
+        <div class="cabecera">
+          <div><h1>Estudiantes</h1><p>Registra los datos del estudiante y su tutor.</p></div>
+        </div>
+        <div class="panel">
+          <h2 id="titulo-form-estudiante">Nuevo estudiante</h2>
+          <p class="subtitulo">El teléfono del tutor debe incluir el código de país (ej. +593…).</p>
+          <form id="form-estudiante">
+            <input type="hidden" id="est-id" />
+            <div class="grid-form">
+              <div class="campo"><label>Nombres *</label><input id="est-nombres" required /></div>
+              <div class="campo"><label>Apellidos *</label><input id="est-apellidos" required /></div>
+              <div class="campo"><label>Curso *</label><input id="est-curso" placeholder="8vo A" required /></div>
+              <div class="campo"><label>Nombre del tutor *</label><input id="est-tutor" required /></div>
+              <div class="campo"><label>Teléfono del tutor *</label><input id="est-telefono" placeholder="+593999888777" required /></div>
+              <div class="campo accion">
+                <button type="submit" class="btn">Guardar estudiante</button>
+                <button type="button" class="btn btn-sec" id="btn-cancelar-estudiante" style="margin-left:8px;">Limpiar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Listado de estudiantes</h2>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Curso</th><th>Tutor</th><th>Teléfono</th><th>Acciones</th></tr></thead>
+              <tbody id="tabla-estudiantes"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Importar estudiantes desde Excel o CSV</h2>
+          <p class="subtitulo">Descarga la plantilla, llénala con los datos de tu colegio y súbela aquí. Se importan todos de una sola vez.</p>
+          <div class="fila-botones">
+            <button type="button" class="btn btn-sec" id="btn-plantilla-estudiantes">⬇️ Descargar plantilla</button>
+            <button type="button" class="btn" id="btn-importar-estudiantes">📥 Importar archivo</button>
+            <input type="file" id="archivo-estudiantes" accept=".xlsx,.xls,.csv" class="oculto" />
+          </div>
+          <div id="resultado-import-estudiantes" class="oculto"></div>
+        </div>
+      </section>
+
+      <!-- MATERIAS -->
+      <section id="vista-materias" class="oculto">
+        <div class="cabecera">
+          <div><h1>Materias</h1><p>Catálogo de asignaturas de la institución.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Nueva materia</h2>
+          <form id="form-materia">
+            <div class="grid-form">
+              <div class="campo"><label>Nombre de la materia *</label><input id="mat-nombre" required /></div>
+              <div class="campo"><label>Docente</label><input id="mat-docente" /></div>
+              <div class="campo accion"><button type="submit" class="btn">Agregar materia</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Materias registradas</h2>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Materia</th><th>Docente</th><th>Acciones</th></tr></thead>
+              <tbody id="tabla-materias"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Importar materias desde Excel o CSV</h2>
+          <p class="subtitulo">Igual que con los estudiantes: descarga la plantilla, llénala y súbela.</p>
+          <div class="fila-botones">
+            <button type="button" class="btn btn-sec" id="btn-plantilla-materias">⬇️ Descargar plantilla</button>
+            <button type="button" class="btn" id="btn-importar-materias">📥 Importar archivo</button>
+            <input type="file" id="archivo-materias" accept=".xlsx,.xls,.csv" class="oculto" />
+          </div>
+          <div id="resultado-import-materias" class="oculto"></div>
+        </div>
+      </section>
+
+      <!-- NOTAS -->
+      <section id="vista-notas" class="oculto">
+        <div class="cabecera">
+          <div><h1>Notas</h1><p>Calificaciones por estudiante, materia y periodo.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Registrar nota</h2>
+          <form id="form-nota">
+            <div class="grid-form">
+              <div class="campo"><label>Estudiante *</label><select id="nota-estudiante" required></select></div>
+              <div class="campo"><label>Materia *</label><select id="nota-materia" required></select></div>
+              <div class="campo"><label>Periodo *</label><input id="nota-periodo" placeholder="1er Trimestre" required /></div>
+              <div class="campo"><label>Calificación *</label><input type="number" step="0.01" id="nota-calificacion" required /></div>
+              <div class="campo"><label>Fecha</label><input type="date" id="nota-fecha" /></div>
+              <div class="campo"><label>Observación</label><input id="nota-observacion" /></div>
+              <div class="campo accion"><button type="submit" class="btn">Guardar nota</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Notas registradas</h2>
+          <div class="escala-leyenda" id="prof-leyenda"></div>
+          <div class="campo" style="max-width:320px;"><label>Filtrar por estudiante</label><select id="filtro-notas"></select></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Materia</th><th>Periodo</th><th>Nota</th><th>Nivel</th><th>Fecha</th><th>Observación</th><th></th></tr></thead>
+              <tbody id="tabla-notas"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Importar notas desde Excel o CSV</h2>
+          <p class="subtitulo">Para cargar calificaciones que ya tengas en una hoja de cálculo. Los estudiantes y las materias deben existir antes.</p>
+          <div class="fila-botones">
+            <button type="button" class="btn btn-sec" id="btn-plantilla-notas">⬇️ Descargar plantilla</button>
+            <button type="button" class="btn" id="btn-importar-notas">📥 Importar archivo</button>
+            <input type="file" id="archivo-notas" accept=".xlsx,.xls,.csv" class="oculto" />
+          </div>
+          <div id="resultado-import-notas" class="oculto"></div>
+        </div>
+      </section>
+
+      <!-- TAREAS -->
+      <section id="vista-tareas" class="oculto">
+        <div class="cabecera">
+          <div><h1>Tareas</h1><p>Seguimiento de trabajos y deberes.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Registrar tarea</h2>
+          <form id="form-tarea">
+            <div class="grid-form">
+              <div class="campo"><label>Estudiante *</label><select id="tarea-estudiante" required></select></div>
+              <div class="campo"><label>Materia *</label><select id="tarea-materia" required></select></div>
+              <div class="campo"><label>Título *</label><input id="tarea-titulo" required /></div>
+              <div class="campo"><label>Descripción</label><input id="tarea-descripcion" /></div>
+              <div class="campo"><label>Fecha de entrega</label><input type="date" id="tarea-fecha" /></div>
+              <div class="campo">
+                <label>Estado</label>
+                <select id="tarea-estado">
+                  <option value="pendiente">Pendiente</option>
+                  <option value="entregada">Entregada</option>
+                  <option value="atrasada">Atrasada</option>
+                </select>
+              </div>
+              <div class="campo"><label>Calificación</label><input type="number" step="0.01" id="tarea-calificacion" /></div>
+              <div class="campo accion"><button type="submit" class="btn">Guardar tarea</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Tareas registradas</h2>
+          <div class="campo" style="max-width:320px;"><label>Filtrar por estudiante</label><select id="filtro-tareas"></select></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Materia</th><th>Título</th><th>Entrega</th><th>Estado</th><th>Nota</th><th></th></tr></thead>
+              <tbody id="tabla-tareas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXAMENES -->
+      <section id="vista-examenes" class="oculto">
+        <div class="cabecera">
+          <div><h1>Exámenes</h1><p>Resultados de pruebas y evaluaciones.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Registrar examen</h2>
+          <form id="form-examen">
+            <div class="grid-form">
+              <div class="campo"><label>Estudiante *</label><select id="exam-estudiante" required></select></div>
+              <div class="campo"><label>Materia *</label><select id="exam-materia" required></select></div>
+              <div class="campo"><label>Título *</label><input id="exam-titulo" required /></div>
+              <div class="campo"><label>Fecha</label><input type="date" id="exam-fecha" /></div>
+              <div class="campo"><label>Calificación</label><input type="number" step="0.01" id="exam-calificacion" /></div>
+              <div class="campo accion"><button type="submit" class="btn">Guardar examen</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Exámenes registrados</h2>
+          <div class="campo" style="max-width:320px;"><label>Filtrar por estudiante</label><select id="filtro-examenes"></select></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Materia</th><th>Título</th><th>Fecha</th><th>Nota</th><th></th></tr></thead>
+              <tbody id="tabla-examenes"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ASISTENCIA -->
+      <section id="vista-asistencia" class="oculto">
+        <div class="cabecera">
+          <div><h1>Asistencia</h1><p>Registro diario de presencia a clases.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Registrar asistencia</h2>
+          <form id="form-asistencia">
+            <div class="grid-form">
+              <div class="campo"><label>Estudiante *</label><select id="asis-estudiante" required></select></div>
+              <div class="campo"><label>Fecha *</label><input type="date" id="asis-fecha" required /></div>
+              <div class="campo">
+                <label>Estado *</label>
+                <select id="asis-estado" required>
+                  <option value="presente">Presente</option>
+                  <option value="ausente">Ausente</option>
+                  <option value="tarde">Tarde</option>
+                  <option value="justificado">Justificado</option>
+                </select>
+              </div>
+              <div class="campo"><label>Observación</label><input id="asis-observacion" /></div>
+              <div class="campo accion"><button type="submit" class="btn">Guardar asistencia</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Registros de asistencia</h2>
+          <div class="campo" style="max-width:320px;"><label>Filtrar por estudiante</label><select id="filtro-asistencia"></select></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Fecha</th><th>Estado</th><th>Observación</th><th></th></tr></thead>
+              <tbody id="tabla-asistencia"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NOTIFICACIONES -->
+      <section id="vista-notificaciones" class="oculto">
+        <div class="cabecera">
+          <div><h1>Notificaciones al tutor</h1><p>Genera el enlace con el reporte y envíalo por WhatsApp.</p></div>
+        </div>
+        <div class="panel">
+          <h2>Nueva notificación</h2>
+          <p class="subtitulo">Se creará un enlace único y privado con el reporte completo del estudiante.</p>
+          <form id="form-notificacion">
+            <div class="grid-form">
+              <div class="campo"><label>Estudiante *</label><select id="noti-estudiante" required></select></div>
+              <div class="campo" style="grid-column: span 2;"><label>Mensaje adicional (opcional)</label><input id="noti-mensaje" placeholder="Ej. Solicito una reunión esta semana." /></div>
+              <div class="campo accion"><button type="submit" class="btn btn-verde">Generar enlace y notificar</button></div>
+            </div>
+          </form>
+          <div id="noti-resultado" class="oculto">
+            <div class="noti-caja">
+              <strong>Enlace del tutor generado</strong>
+              <span id="noti-texto"></span>
+              <code id="noti-enlace"></code>
+              <div class="noti-acciones">
+                <a id="noti-whatsapp" class="btn btn-verde" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+                <a id="noti-whatsapp-web" class="btn btn-sec" target="_blank" rel="noopener">WhatsApp Web</a>
+                <button class="btn btn-sec" id="noti-copiar">Copiar enlace</button>
+                <button class="btn btn-sec" id="noti-copiar-mensaje">Copiar mensaje</button>
+                <a id="noti-ver" class="btn btn-sec" target="_blank" rel="noopener">Ver reporte</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Historial de notificaciones</h2>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Estudiante</th><th>Tutor</th><th>Enlace</th><th>Acciones</th></tr></thead>
+              <tbody id="tabla-notificaciones"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- AJUSTES -->
+      <section id="vista-ajustes" class="oculto">
+        <div class="cabecera">
+          <div><h1>Ajustes</h1><p>Inicio de sesión con Google y enlaces para WhatsApp.</p></div>
+        </div>
+
+        <div class="panel">
+          <h2>Cuenta de Google</h2>
+          <p class="subtitulo">El panel se abre únicamente con una cuenta de Google.</p>
+          <div id="ajustes-google"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Enlaces para el tutor (WhatsApp)</h2>
+          <p class="subtitulo">PISAC elige automáticamente la mejor dirección disponible para los enlaces del reporte.</p>
+          <div id="ajustes-url"></div>
+          <div class="campo" style="max-width:520px;margin-top:16px">
+            <label for="ajuste-base-url">Dirección pública (opcional)</label>
+            <input id="ajuste-base-url" placeholder="https://mi-app.onrender.com" autocomplete="off" spellcheck="false" />
+            <p style="font-size:12px;color:var(--gris-500);margin-top:6px">
+              Solo hace falta si quieres que el enlace funcione fuera de tu red (datos móviles u otra red).
+              Para una demo puedes usar un túnel gratuito:<br />
+              <code style="background:#060b16;border:1px solid var(--borde);padding:2px 6px;border-radius:5px">cloudflared tunnel --url http://localhost:3000</code><br />
+              y pegar aquí la dirección <code style="background:#060b16;border:1px solid var(--borde);padding:2px 6px;border-radius:5px">https://algo.trycloudflare.com</code>.
+            </p>
+          </div>
+          <div class="fila-botones" style="margin-top:6px">
+            <button class="btn" id="btn-guardar-ajustes">Guardar dirección</button>
+            <button class="btn btn-sec" id="btn-restaurar-url">Quitar dirección pública</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Cómo se envía el mensaje</h2>
+          <p class="subtitulo">PISAC no envía mensajes por sí sola: abre WhatsApp con el mensaje y el enlace ya escritos, y tú solo pulsas enviar. Así funciona con cualquier número y sin costo.</p>
+          <ol style="margin-left:18px;font-size:13.5px;color:var(--gris-700);line-height:1.9">
+            <li>Registra al estudiante con el teléfono del tutor incluyendo el código de país (<code style="background:#060b16;border:1px solid var(--borde);padding:1px 5px;border-radius:4px">+593…</code>).</li>
+            <li>En <strong>Notificaciones</strong> elige el estudiante y pulsa <strong>Generar enlace y notificar</strong>.</li>
+            <li>Pulsa <strong>Enviar por WhatsApp</strong>: se abre WhatsApp con el mensaje listo.</li>
+            <li>Pulsa enviar dentro de WhatsApp. El tutor recibe el texto y el enlace del reporte.</li>
+          </ol>
+          <div class="whatsapp-preview">
+            <div class="burbuja" id="wa-ejemplo">Estimado/a María Gómez, le escribimos de la institución educativa para informarle el seguimiento académico de Juan Pérez (8vo A). Promedio general: 72/100. Asistencia: 90%. Ver detalle: https://tu-app.onrender.com/s/abc123</div>
+            <div class="hora">Ejemplo del mensaje · ahora</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/js/profesor.js"></script>
+</body>
+</html>

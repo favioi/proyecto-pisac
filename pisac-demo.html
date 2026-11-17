@@ -1,0 +1,1303 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PISAC · Demo</title>
+<style>
+:root{
+  --azul:#1f4e79;--azul-claro:#2e6da4;--azul-suave:#eaf2fa;
+  --verde:#1e8e5a;--verde-suave:#e6f6ee;--rojo:#c0392b;--rojo-suave:#fdecea;
+  --ambar:#b7791f;--ambar-suave:#fdf3e3;--gris-900:#1f2933;--gris-700:#52606d;
+  --gris-500:#7b8794;--gris-300:#cbd2d9;--gris-100:#f4f6f8;--blanco:#fff;
+  --sombra:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.06);
+  --sombra-md:0 4px 16px rgba(16,24,40,.10);--radio:12px;--radio-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;color:var(--gris-900);background:var(--gris-100);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--azul-claro)}
+.oculto{display:none !important}
+
+/* Login */
+.login-wrap{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr;background:var(--blanco)}
+.login-marca{background:linear-gradient(150deg,#1f4e79 0%,#2e6da4 55%,#3f8ac9 100%);color:#fff;padding:56px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.login-marca::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:rgba(255,255,255,.07);right:-180px;bottom:-200px}
+.login-logo{font-size:40px;font-weight:800;letter-spacing:2px;margin-bottom:6px}
+.login-logo span{opacity:.8}
+.login-marca h1{font-size:30px;font-weight:700;margin-bottom:14px}
+.login-marca p{font-size:16px;max-width:440px;opacity:.92}
+.login-marca ul{list-style:none;margin-top:28px}
+.login-marca li{padding:9px 0 9px 32px;position:relative;font-size:15px;opacity:.95}
+.login-marca li::before{content:"✓";position:absolute;left:0;top:8px;width:20px;height:20px;background:rgba(255,255,255,.2);border-radius:50%;font-size:12px;display:grid;place-items:center}
+.login-form{display:flex;align-items:center;justify-content:center;padding:40px}
+.login-card{width:100%;max-width:380px}
+.login-card h2{font-size:24px;margin-bottom:6px}
+.login-card>p{color:var(--gris-500);margin-bottom:26px}
+
+/* Campos */
+.campo{margin-bottom:16px}
+.campo label{display:block;font-size:13px;font-weight:600;color:var(--gris-700);margin-bottom:6px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--gris-300);border-radius:var(--radio-sm);font-size:14px;font-family:inherit;background:#fff;color:var(--gris-900);transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-claro);box-shadow:0 0 0 3px rgba(46,109,164,.15)}
+textarea{resize:vertical;min-height:74px}
+
+/* Botones */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border:none;border-radius:var(--radio-sm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--azul);color:#fff;transition:background .15s,transform .05s;text-decoration:none}
+.btn:hover{background:#173c5d}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-block{width:100%}
+.btn-sec{background:var(--gris-100);color:var(--gris-700);border:1px solid var(--gris-300)}
+.btn-sec:hover{background:#e8ecef}
+.btn-verde{background:var(--verde)}
+.btn-verde:hover{background:#176e46}
+.btn-rojo{background:var(--rojo)}
+.btn-rojo:hover{background:#992d21}
+.btn-mini{padding:5px 10px;font-size:12px;border-radius:6px}
+
+/* Layout app */
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{background:var(--azul);color:#fff;display:flex;flex-direction:column;padding:22px 0}
+.sidebar-logo{padding:0 22px 22px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:14px}
+.sidebar-logo b{font-size:24px;letter-spacing:2px;display:block}
+.sidebar-logo small{font-size:11px;opacity:.75;display:block;margin-top:3px;line-height:1.3}
+.nav{list-style:none;flex:1}
+.nav li{margin:2px 10px}
+.nav button{width:100%;text-align:left;background:transparent;color:rgba(255,255,255,.85);border:none;border-radius:var(--radio-sm);padding:10px 14px;font-size:14px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s}
+.nav button:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav button.activo{background:rgba(255,255,255,.18);color:#fff;font-weight:600}
+.nav .icono{font-size:16px;width:18px;text-align:center}
+.sidebar-pie{padding:14px 22px 0;border-top:1px solid rgba(255,255,255,.15);margin-top:10px}
+.sidebar-pie .usuario{font-size:13px;opacity:.9;margin-bottom:8px;word-break:break-all}
+.contenido{padding:30px 34px;overflow-x:auto}
+
+.cabecera{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.cabecera h1{font-size:24px}
+.cabecera p{color:var(--gris-500);font-size:14px}
+.barra-herramientas{display:flex;gap:10px;flex-wrap:wrap}
+
+/* Tarjetas */
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:24px}
+.tarjeta{background:#fff;border-radius:var(--radio);padding:18px 20px;box-shadow:var(--sombra);border-left:4px solid var(--azul-claro)}
+.tarjeta.verde{border-left-color:var(--verde)}
+.tarjeta.rojo{border-left-color:var(--rojo)}
+.tarjeta.ambar{border-left-color:var(--ambar)}
+.tarjeta .etiqueta{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gris-500);font-weight:600}
+.tarjeta .valor{font-size:28px;font-weight:700;margin-top:6px}
+.tarjeta .detalle{font-size:12px;color:var(--gris-500);margin-top:2px}
+
+.panel{background:#fff;border-radius:var(--radio);box-shadow:var(--sombra);padding:22px 24px;margin-bottom:22px}
+.panel h2{font-size:17px;margin-bottom:4px}
+.panel .subtitulo{color:var(--gris-500);font-size:13px;margin-bottom:18px}
+.grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;align-items:end}
+.grid-form .campo{margin-bottom:0}
+.grid-form .accion{display:flex;align-items:end;gap:8px;flex-wrap:wrap}
+
+/* Tablas */
+.tabla-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--gris-100)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--gris-500);font-weight:700;background:var(--gris-100)}
+tbody tr:hover{background:#fafbfc}
+.vacio{text-align:center;color:var(--gris-500);padding:28px;font-size:14px}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge-verde{background:var(--verde-suave);color:var(--verde)}
+.badge-rojo{background:var(--rojo-suave);color:var(--rojo)}
+.badge-ambar{background:var(--ambar-suave);color:var(--ambar)}
+.badge-gris{background:var(--gris-100);color:var(--gris-700)}
+.badge-azul{background:var(--azul-suave);color:var(--azul)}
+
+/* Notificaciones */
+.noti-caja{background:var(--azul-suave);border:1px solid #cfe1f3;border-radius:var(--radio-sm);padding:14px 16px;margin-top:16px;font-size:13px;word-break:break-word}
+.noti-caja strong{display:block;margin-bottom:6px;color:var(--azul)}
+.noti-caja code{display:block;background:#fff;border:1px solid var(--gris-300);border-radius:6px;padding:8px 10px;margin-top:6px;font-size:12px;word-break:break-all}
+.noti-acciones{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+/* Vista tutor */
+.overlay{position:fixed;inset:0;background:var(--gris-100);overflow-y:auto;z-index:50}
+.seguimiento{max-width:1080px;margin:0 auto;padding:26px 20px 60px}
+.seg-header{background:linear-gradient(135deg,#1f4e79,#2e6da4);color:#fff;border-radius:var(--radio);padding:26px 28px;margin-bottom:22px}
+.seg-header .marca{font-size:13px;letter-spacing:2px;opacity:.8;font-weight:700}
+.seg-header h1{font-size:26px;margin:8px 0 4px}
+.seg-header p{opacity:.92;font-size:14px}
+.seg-header .curso{display:inline-block;background:rgba(255,255,255,.18);padding:3px 12px;border-radius:999px;font-size:13px;margin-top:10px}
+.aviso-riesgo{background:var(--rojo-suave);border-left:4px solid var(--rojo);border-radius:var(--radio-sm);padding:14px 18px;margin-bottom:20px;color:#7d241a;font-size:14px}
+.aviso-bien{background:var(--verde-suave);border-left:4px solid var(--verde);border-radius:var(--radio-sm);padding:14px 18px;margin-bottom:20px;color:#145c39;font-size:14px}
+.mensaje-prof{background:#fff;border:1px dashed var(--azul-claro);border-radius:var(--radio-sm);padding:14px 18px;margin-bottom:20px;font-size:14px}
+.mensaje-prof strong{color:var(--azul)}
+.barra{height:8px;background:var(--gris-100);border-radius:999px;overflow:hidden;min-width:80px}
+.barra>span{display:block;height:100%;background:var(--azul-claro);border-radius:999px}
+.barra.rojo>span{background:var(--rojo)}
+.barra.ambar>span{background:var(--ambar)}
+.barra.verde>span{background:var(--verde)}
+.escala-leyenda{background:#fff;border:1px solid var(--gris-300);border-radius:var(--radio-sm);padding:10px 16px;margin-bottom:20px;font-size:13px;color:var(--gris-700);text-align:center}
+.aviso-ambar{background:var(--ambar-suave);border-left:4px solid var(--ambar);border-radius:var(--radio-sm);padding:14px 18px;margin-bottom:20px;color:#7a5410;font-size:14px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gris-900);color:#fff;padding:13px 20px;border-radius:var(--radio-sm);box-shadow:var(--sombra-md);font-size:14px;opacity:0;transform:translateY(12px);transition:all .25s;pointer-events:none;z-index:100}
+.toast.visible{opacity:1;transform:translateY(0)}
+.toast.error{background:var(--rojo)}
+.toast.ok{background:var(--verde)}
+
+@media(max-width:900px){
+  .login-wrap{grid-template-columns:1fr}
+  .login-marca{display:none}
+  .app{grid-template-columns:1fr}
+  .sidebar{flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px}
+  .sidebar-logo{border:none;padding:0 12px 0 0;margin:0}
+  .nav{display:flex;flex-wrap:wrap}
+  .nav li{margin:2px}
+  .nav button{padding:7px 10px;font-size:13px}
+  .nav .icono{display:none}
+  .sidebar-pie{border:none;margin:0;padding:0 12px}
+  .contenido{padding:18px}
+}
+@media print{
+  .no-print{display:none !important}
+  .overlay{position:static}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="vista-login" class="login-wrap">
+  <section class="login-marca">
+    <div class="login-logo">PISA<span>C</span></div>
+    <h1>Plataforma de Interacción y Seguimiento Académico</h1>
+    <p>Notifica a los tutores el rendimiento académico de sus representados: notas por materia, tareas, exámenes y asistencia, con un enlace directo por WhatsApp.</p>
+    <ul>
+      <li>Registro de notas, tareas y exámenes</li>
+      <li>Control de asistencia diaria</li>
+      <li>Reporte detallado para el tutor</li>
+      <li>Notificación por WhatsApp en un clic</li>
+    </ul>
+  </section>
+  <section class="login-form">
+    <div class="login-card">
+      <h2>Iniciar sesión</h2>
+      <p>Acceso exclusivo para docentes.</p>
+      <form id="form-login">
+        <div class="campo">
+          <label>Correo electrónico</label>
+          <input type="email" id="email" value="admin@pisac.edu" required />
+        </div>
+        <div class="campo">
+          <label>Contraseña</label>
+          <input type="password" id="password" value="admin123" required />
+        </div>
+        <div class="campo" style="display:flex;align-items:center;gap:8px;margin-top:2px">
+          <input type="checkbox" id="recordar" checked style="width:auto;margin:0" />
+          <label for="recordar" style="margin:0;font-weight:500;cursor:pointer">Mantener mi sesión iniciada</label>
+        </div>
+        <button type="submit" class="btn btn-block">Entrar al panel</button>
+      </form>
+      <div id="login-error" class="oculto" style="margin-top:14px;color:var(--rojo);font-size:13px"></div>
+      <p style="margin-top:22px;font-size:12px;color:var(--gris-500)">Credenciales de demostración: <strong>admin@pisac.edu</strong> / <strong>admin123</strong></p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="app oculto">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <b>PISAC</b>
+      <small>Interacción y Seguimiento Académico</small>
+    </div>
+    <ul class="nav" id="nav">
+      <li><button data-vista="inicio" class="activo"><span class="icono">📊</span> Inicio</button></li>
+      <li><button data-vista="estudiantes"><span class="icono">🎓</span> Estudiantes</button></li>
+      <li><button data-vista="materias"><span class="icono">📚</span> Materias</button></li>
+      <li><button data-vista="notas"><span class="icono">📝</span> Notas</button></li>
+      <li><button data-vista="tareas"><span class="icono">📌</span> Tareas</button></li>
+      <li><button data-vista="examenes"><span class="icono">🧪</span> Exámenes</button></li>
+      <li><button data-vista="asistencia"><span class="icono">🗓️</span> Asistencia</button></li>
+      <li><button data-vista="notificaciones"><span class="icono">📲</span> Notificaciones</button></li>
+    </ul>
+    <div class="sidebar-pie">
+      <div class="usuario">Prof. Administrador</div>
+      <button class="btn btn-sec btn-mini" id="btn-salir">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="contenido">
+    <!-- INICIO -->
+    <section id="vista-inicio">
+      <div class="cabecera">
+        <div><h1>Panel de control</h1><p>Resumen general del seguimiento académico.</p></div>
+        <div class="barra-herramientas">
+          <button class="btn btn-sec btn-mini" id="btn-ejemplo">Cargar datos de ejemplo</button>
+          <button class="btn btn-rojo btn-mini" id="btn-borrar">Borrar todo</button>
+        </div>
+      </div>
+      <div class="tarjetas" id="tarjetas-resumen"></div>
+      <div class="panel">
+        <h2>Estudiantes con bajo rendimiento</h2>
+        <p class="subtitulo">Promedio general por debajo de la nota aprobatoria.</p>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Estudiante</th><th>Curso</th><th>Promedio</th><th>Tutor</th><th>Estado</th></tr></thead>
+          <tbody id="tabla-riesgo"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ESTUDIANTES -->
+    <section id="vista-estudiantes" class="oculto">
+      <div class="cabecera"><div><h1>Estudiantes</h1><p>Registra los datos del estudiante y su tutor.</p></div></div>
+      <div class="panel">
+        <h2 id="titulo-form-estudiante">Nuevo estudiante</h2>
+        <p class="subtitulo">El teléfono del tutor debe incluir el código de país (ej. +593…).</p>
+        <form id="form-estudiante">
+          <input type="hidden" id="est-id" />
+          <div class="grid-form">
+            <div class="campo"><label>Nombres *</label><input id="est-nombres" required /></div>
+            <div class="campo"><label>Apellidos *</label><input id="est-apellidos" required /></div>
+            <div class="campo"><label>Curso *</label><input id="est-curso" placeholder="8vo A" required /></div>
+            <div class="campo"><label>Nombre del tutor *</label><input id="est-tutor" required /></div>
+            <div class="campo"><label>Teléfono del tutor *</label><input id="est-telefono" placeholder="+593999888777" required /></div>
+            <div class="campo accion">
+              <button type="submit" class="btn">Guardar estudiante</button>
+              <button type="button" class="btn btn-sec" id="btn-cancelar-estudiante">Limpiar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Listado de estudiantes</h2>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Estudiante</th><th>Curso</th><th>Tutor</th><th>Teléfono</th><th>Acciones</th></tr></thead>
+          <tbody id="tabla-estudiantes"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- MATERIAS -->
+    <section id="vista-materias" class="oculto">
+      <div class="cabecera"><div><h1>Materias</h1><p>Catálogo de asignaturas de la institución.</p></div></div>
+      <div class="panel">
+        <h2>Nueva materia</h2>
+        <form id="form-materia">
+          <div class="grid-form">
+            <div class="campo"><label>Nombre de la materia *</label><input id="mat-nombre" required /></div>
+            <div class="campo"><label>Docente</label><input id="mat-docente" /></div>
+            <div class="campo accion"><button type="submit" class="btn">Agregar materia</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Materias registradas</h2>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Materia</th><th>Docente</th><th>Acciones</th></tr></thead>
+          <tbody id="tabla-materias"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- NOTAS -->
+    <section id="vista-notas" class="oculto">
+      <div class="cabecera"><div><h1>Notas</h1><p>Calificaciones por estudiante, materia y periodo.</p></div></div>
+      <div class="panel">
+        <h2>Registrar nota</h2>
+        <form id="form-nota">
+          <div class="grid-form">
+            <div class="campo"><label>Estudiante *</label><select id="nota-estudiante" required></select></div>
+            <div class="campo"><label>Materia *</label><select id="nota-materia" required></select></div>
+            <div class="campo"><label>Periodo *</label><input id="nota-periodo" placeholder="1er Trimestre" required /></div>
+            <div class="campo"><label>Calificación (sobre 100) *</label><input type="number" step="0.01" min="0" max="100" placeholder="0 - 100" id="nota-calificacion" required /></div>
+            <div class="campo"><label>Fecha</label><input type="date" id="nota-fecha" /></div>
+            <div class="campo"><label>Observación</label><input id="nota-observacion" /></div>
+            <div class="campo accion"><button type="submit" class="btn">Guardar nota</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Notas registradas</h2>
+        <div class="escala-leyenda" id="prof-leyenda"></div>
+        <div class="campo" style="max-width:320px"><label>Filtrar por estudiante</label><select id="filtro-notas"></select></div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Estudiante</th><th>Materia</th><th>Periodo</th><th>Nota</th><th>Nivel</th><th>Fecha</th><th>Observación</th><th></th></tr></thead>
+          <tbody id="tabla-notas"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- TAREAS -->
+    <section id="vista-tareas" class="oculto">
+      <div class="cabecera"><div><h1>Tareas</h1><p>Seguimiento de trabajos y deberes.</p></div></div>
+      <div class="panel">
+        <h2>Registrar tarea</h2>
+        <form id="form-tarea">
+          <div class="grid-form">
+            <div class="campo"><label>Estudiante *</label><select id="tarea-estudiante" required></select></div>
+            <div class="campo"><label>Materia *</label><select id="tarea-materia" required></select></div>
+            <div class="campo"><label>Título *</label><input id="tarea-titulo" required /></div>
+            <div class="campo"><label>Descripción</label><input id="tarea-descripcion" /></div>
+            <div class="campo"><label>Fecha de entrega</label><input type="date" id="tarea-fecha" /></div>
+            <div class="campo"><label>Estado</label><select id="tarea-estado">
+              <option value="pendiente">Pendiente</option><option value="entregada">Entregada</option><option value="atrasada">Atrasada</option>
+            </select></div>
+            <div class="campo"><label>Calificación (sobre 100)</label><input type="number" step="0.01" min="0" max="100" placeholder="0 - 100" id="tarea-calificacion" /></div>
+            <div class="campo accion"><button type="submit" class="btn">Guardar tarea</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Tareas registradas</h2>
+        <div class="campo" style="max-width:320px"><label>Filtrar por estudiante</label><select id="filtro-tareas"></select></div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Estudiante</th><th>Materia</th><th>Título</th><th>Entrega</th><th>Estado</th><th>Nota</th><th></th></tr></thead>
+          <tbody id="tabla-tareas"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- EXAMENES -->
+    <section id="vista-examenes" class="oculto">
+      <div class="cabecera"><div><h1>Exámenes</h1><p>Resultados de pruebas y evaluaciones.</p></div></div>
+      <div class="panel">
+        <h2>Registrar examen</h2>
+        <form id="form-examen">
+          <div class="grid-form">
+            <div class="campo"><label>Estudiante *</label><select id="exam-estudiante" required></select></div>
+            <div class="campo"><label>Materia *</label><select id="exam-materia" required></select></div>
+            <div class="campo"><label>Título *</label><input id="exam-titulo" required /></div>
+            <div class="campo"><label>Fecha</label><input type="date" id="exam-fecha" /></div>
+            <div class="campo"><label>Calificación (sobre 100)</label><input type="number" step="0.01" min="0" max="100" placeholder="0 - 100" id="exam-calificacion" /></div>
+            <div class="campo accion"><button type="submit" class="btn">Guardar examen</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Exámenes registrados</h2>
+        <div class="campo" style="max-width:320px"><label>Filtrar por estudiante</label><select id="filtro-examenes"></select></div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Estudiante</th><th>Materia</th><th>Título</th><th>Fecha</th><th>Nota</th><th></th></tr></thead>
+          <tbody id="tabla-examenes"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ASISTENCIA -->
+    <section id="vista-asistencia" class="oculto">
+      <div class="cabecera"><div><h1>Asistencia</h1><p>Registro diario de presencia a clases.</p></div></div>
+      <div class="panel">
+        <h2>Registrar asistencia</h2>
+        <form id="form-asistencia">
+          <div class="grid-form">
+            <div class="campo"><label>Estudiante *</label><select id="asis-estudiante" required></select></div>
+            <div class="campo"><label>Fecha *</label><input type="date" id="asis-fecha" required /></div>
+            <div class="campo"><label>Estado *</label><select id="asis-estado" required>
+              <option value="presente">Presente</option><option value="ausente">Ausente</option>
+              <option value="tarde">Tarde</option><option value="justificado">Justificado</option>
+            </select></div>
+            <div class="campo"><label>Observación</label><input id="asis-observacion" /></div>
+            <div class="campo accion"><button type="submit" class="btn">Guardar asistencia</button></div>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Registros de asistencia</h2>
+        <div class="campo" style="max-width:320px"><label>Filtrar por estudiante</label><select id="filtro-asistencia"></select></div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Estudiante</th><th>Fecha</th><th>Estado</th><th>Observación</th><th></th></tr></thead>
+          <tbody id="tabla-asistencia"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- NOTIFICACIONES -->
+    <section id="vista-notificaciones" class="oculto">
+      <div class="cabecera"><div><h1>Notificaciones al tutor</h1><p>Genera el enlace con el reporte y envíalo por WhatsApp.</p></div></div>
+      <div class="panel">
+        <h2>Nueva notificación</h2>
+        <p class="subtitulo">Se creará un enlace único y privado con el reporte completo del estudiante.</p>
+        <form id="form-notificacion">
+          <div class="grid-form">
+            <div class="campo"><label>Estudiante *</label><select id="noti-estudiante" required></select></div>
+            <div class="campo" style="grid-column:span 2"><label>Mensaje adicional (opcional)</label><input id="noti-mensaje" placeholder="Ej. Solicito una reunión esta semana." /></div>
+            <div class="campo accion"><button type="submit" class="btn btn-verde">Generar enlace y notificar</button></div>
+          </div>
+        </form>
+        <div id="noti-resultado" class="oculto">
+          <div class="noti-caja">
+            <strong>Notificación generada</strong>
+            <span id="noti-texto"></span>
+            <code id="noti-enlace"></code>
+            <div class="noti-acciones">
+              <a id="noti-whatsapp" class="btn btn-verde" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+              <button class="btn btn-sec" id="noti-copiar">Copiar mensaje</button>
+              <button class="btn" id="noti-ver">Ver reporte del tutor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Historial de notificaciones</h2>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Fecha</th><th>Estudiante</th><th>Tutor</th><th>Acciones</th></tr></thead>
+          <tbody id="tabla-notificaciones"></tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ================= VISTA TUTOR ================= -->
+<div id="vista-tutor" class="overlay oculto">
+  <div class="seguimiento">
+    <div class="no-print" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-sec btn-mini" id="tutor-volver">← Volver al panel</button>
+      <button class="btn btn-mini" id="tutor-imprimir">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+    <header class="seg-header">
+      <div class="marca">PISAC</div>
+      <h1 id="tutor-nombre">—</h1>
+      <p id="tutor-tutor">—</p>
+      <span class="curso" id="tutor-curso">—</span>
+    </header>
+    <div id="tutor-aviso"></div>
+    <div id="tutor-mensaje" class="mensaje-prof oculto"></div>
+    <div class="tarjetas" id="tutor-tarjetas"></div>
+    <div class="escala-leyenda" id="tutor-leyenda"></div>
+    <div class="panel">
+      <h2>Rendimiento por materia</h2>
+      <p class="subtitulo">Promedio de calificaciones agrupadas por asignatura.</p>
+      <div class="tabla-wrap"><table>
+        <thead><tr><th>Materia</th><th>Promedio</th><th>Progreso</th><th>Registros</th><th>Estado</th></tr></thead>
+        <tbody id="tutor-materias"></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h2>Notas detalladas</h2>
+      <div class="tabla-wrap"><table>
+        <thead><tr><th>Materia</th><th>Periodo</th><th>Nota</th><th>Nivel</th><th>Fecha</th><th>Observación</th></tr></thead>
+        <tbody id="tutor-notas"></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h2>Tareas</h2>
+      <div class="tabla-wrap"><table>
+        <thead><tr><th>Materia</th><th>Título</th><th>Entrega</th><th>Estado</th><th>Nota</th></tr></thead>
+        <tbody id="tutor-tareas"></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h2>Exámenes</h2>
+      <div class="tabla-wrap"><table>
+        <thead><tr><th>Materia</th><th>Título</th><th>Fecha</th><th>Nota</th></tr></thead>
+        <tbody id="tutor-examenes"></tbody>
+      </table></div>
+    </div>
+    <div class="panel">
+      <h2>Asistencia</h2>
+      <p class="subtitulo">Registro de días asistidos a clases.</p>
+      <div class="tabla-wrap"><table>
+        <thead><tr><th>Fecha</th><th>Estado</th><th>Observación</th></tr></thead>
+        <tbody id="tutor-asistencia"></tbody>
+      </table></div>
+    </div>
+    <p style="text-align:center;color:var(--gris-500);font-size:12px;margin-top:24px">PISAC · Plataforma de Interacción y Seguimiento Académico</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   PISAC · Demo de un solo archivo (sin servidor)
+   Datos guardados en localStorage del navegador.
+   ===================================================================== */
+'use strict';
+
+var STORAGE_KEY = 'pisac_demo_v1';
+var SESION_KEY = 'pisac_demo_sesion';
+var NOTA_MAXIMA = 100;
+var NOTA_APROBATORIA = 51;
+var NIVEL_BUENO = 71;
+var NIVEL_EXCELENTE = 91;
+var DB = null;
+
+var $ = function (s) { return document.querySelector(s); };
+var $$ = function (s) { return document.querySelectorAll(s); };
+
+function escapar(t) {
+  return String(t == null ? '' : t)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function formatearFecha(v) {
+  if (!v) return '—';
+  var p = String(v).slice(0, 10).split('-');
+  return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : String(v);
+}
+function formatearFechaHora(v) {
+  if (!v) return '—';
+  return String(v).replace('T', ' ').slice(0, 16);
+}
+function hoyISO() { return new Date().toISOString().slice(0, 10); }
+function redondear(n, d) { var f = Math.pow(10, d || 2); return Math.round(n * f) / f; }
+
+var toastTimer;
+function toast(msg, tipo) {
+  var el = $('#toast');
+  el.textContent = msg;
+  el.className = 'toast visible ' + (tipo || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.className = 'toast'; }, 2800);
+}
+
+/* ------------------------------------------------ Datos de ejemplo ---- */
+function datosIniciales() {
+  var materias = [
+    { id: 1, nombre: 'Matemáticas', docente: 'Lic. Pedro Salas' },
+    { id: 2, nombre: 'Lengua y Literatura', docente: 'Lic. Ana Ríos' },
+    { id: 3, nombre: 'Ciencias Naturales', docente: 'Lic. Jorge Ponce' },
+    { id: 4, nombre: 'Estudios Sociales', docente: 'Lic. Marta Vega' },
+    { id: 5, nombre: 'Inglés', docente: 'Lic. Sara Cruz' },
+    { id: 6, nombre: 'Educación Física', docente: 'Lic. Hugo Núñez' }
+  ];
+
+  var estudiantes = [
+    { id: 1, nombres: 'Juan Andrés', apellidos: 'Pérez Gómez', curso: '8vo A', tutor_nombre: 'María Gómez', tutor_telefono: '+593999888777' },
+    { id: 2, nombres: 'Ana Sofía', apellidos: 'Torres Ruiz', curso: '9no B', tutor_nombre: 'Luis Torres', tutor_telefono: '+593911222333' },
+    { id: 3, nombres: 'Carlos Emilio', apellidos: 'Vargas León', curso: '8vo A', tutor_nombre: 'Rosa Vargas', tutor_telefono: '+593988777666' }
+  ];
+
+  var notas = [
+    { id: 1, estudiante_id: 1, materia_id: 1, periodo: '1er Trimestre', calificacion: 51, observacion: 'Bajo rendimiento en álgebra', fecha: '2025-04-10' },
+    { id: 2, estudiante_id: 1, materia_id: 1, periodo: '2do Trimestre', calificacion: 35, observacion: 'No alcanza la nota mínima', fecha: '2025-06-15' },
+    { id: 3, estudiante_id: 1, materia_id: 2, periodo: '1er Trimestre', calificacion: 62, observacion: '', fecha: '2025-04-12' },
+    { id: 4, estudiante_id: 1, materia_id: 2, periodo: '2do Trimestre', calificacion: 70, observacion: 'Buena comprensión lectora', fecha: '2025-06-18' },
+    { id: 5, estudiante_id: 1, materia_id: 3, periodo: '1er Trimestre', calificacion: 45, observacion: 'Requiere refuerzo', fecha: '2025-04-20' },
+    { id: 6, estudiante_id: 1, materia_id: 3, periodo: '2do Trimestre', calificacion: 40, observacion: 'Faltan trabajos prácticos', fecha: '2025-06-22' },
+    { id: 7, estudiante_id: 1, materia_id: 4, periodo: '1er Trimestre', calificacion: 50, observacion: '', fecha: '2025-04-25' },
+    { id: 8, estudiante_id: 1, materia_id: 5, periodo: '1er Trimestre', calificacion: 42, observacion: 'Reforzar vocabulario', fecha: '2025-04-28' },
+    { id: 9, estudiante_id: 2, materia_id: 1, periodo: '1er Trimestre', calificacion: 92, observacion: '', fecha: '2025-04-11' },
+    { id: 10, estudiante_id: 2, materia_id: 2, periodo: '1er Trimestre', calificacion: 88, observacion: '', fecha: '2025-04-14' },
+    { id: 11, estudiante_id: 2, materia_id: 3, periodo: '1er Trimestre', calificacion: 95, observacion: 'Excelente', fecha: '2025-04-19' },
+    { id: 12, estudiante_id: 3, materia_id: 1, periodo: '1er Trimestre', calificacion: 68, observacion: '', fecha: '2025-04-13' },
+    { id: 13, estudiante_id: 3, materia_id: 5, periodo: '1er Trimestre', calificacion: 50, observacion: 'Requiere refuerzo', fecha: '2025-04-27' }
+  ];
+
+  var tareas = [
+    { id: 1, estudiante_id: 1, materia_id: 1, titulo: 'Ejercicios de ecuaciones', descripcion: 'Resolver la guía 3', fecha_entrega: '2025-06-25', estado: 'pendiente', calificacion: null },
+    { id: 2, estudiante_id: 1, materia_id: 2, titulo: 'Ensayo sobre la lectura', descripcion: 'Entrega del ensayo', fecha_entrega: '2025-06-20', estado: 'entregada', calificacion: 85 },
+    { id: 3, estudiante_id: 1, materia_id: 3, titulo: 'Maqueta del sistema solar', descripcion: 'Trabajo grupal', fecha_entrega: '2025-06-18', estado: 'atrasada', calificacion: null },
+    { id: 4, estudiante_id: 1, materia_id: 5, titulo: 'Vocabulario unidad 4', descripcion: 'Completar plana', fecha_entrega: '2025-06-28', estado: 'pendiente', calificacion: null },
+    { id: 5, estudiante_id: 2, materia_id: 1, titulo: 'Problemas de fracciones', descripcion: '', fecha_entrega: '2025-06-22', estado: 'entregada', calificacion: 95 }
+  ];
+
+  var examenes = [
+    { id: 1, estudiante_id: 1, materia_id: 1, titulo: 'Examen de álgebra', fecha: '2025-05-10', calificacion: 51 },
+    { id: 2, estudiante_id: 1, materia_id: 2, titulo: 'Prueba de ortografía', fecha: '2025-05-14', calificacion: 70 },
+    { id: 3, estudiante_id: 1, materia_id: 3, titulo: 'Examen de biología', fecha: '2025-05-20', calificacion: 45 },
+    { id: 4, estudiante_id: 1, materia_id: 4, titulo: 'Lección de historia', fecha: '2025-05-24', calificacion: 50 },
+    { id: 5, estudiante_id: 2, materia_id: 1, titulo: 'Examen de álgebra', fecha: '2025-05-11', calificacion: 90 }
+  ];
+
+  var asistencia = [];
+  var estadosJuan = ['presente','presente','presente','tarde','presente','ausente','presente','presente','justificado','presente'];
+  for (var i = 0; i < estadosJuan.length; i++) {
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    asistencia.push({
+      id: i + 1, estudiante_id: 1,
+      fecha: d.toISOString().slice(0, 10),
+      estado: estadosJuan[i], observacion: estadosJuan[i] === 'ausente' ? 'Cita médica' : ''
+    });
+  }
+  for (var j = 0; j < 8; j++) {
+    var d2 = new Date();
+    d2.setDate(d2.getDate() - j);
+    asistencia.push({
+      id: 100 + j, estudiante_id: 2,
+      fecha: d2.toISOString().slice(0, 10),
+      estado: 'presente', observacion: ''
+    });
+  }
+
+  return {
+    escala: NOTA_MAXIMA,
+    estudiantes: estudiantes, materias: materias, notas: notas,
+    tareas: tareas, examenes: examenes, asistencia: asistencia, notificaciones: []
+  };
+}
+
+function cargar() {
+  var raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { DB = JSON.parse(raw); } catch (e) { DB = datosIniciales(); }
+  } else {
+    DB = datosIniciales();
+    guardar();
+  }
+  if (!DB.notificaciones) DB.notificaciones = [];
+  migrarEscala();
+}
+
+/* Convierte datos guardados con la escala antigua (sobre 10) a la escala
+   actual (sobre 100). No modifica los datos que ya estan en escala de 100. */
+function migrarEscala() {
+  if (DB.escala === NOTA_MAXIMA) return;
+  var valores = [];
+  (DB.notas || []).forEach(function (n) { valores.push(Number(n.calificacion)); });
+  (DB.tareas || []).forEach(function (t) { if (t.calificacion != null) valores.push(Number(t.calificacion)); });
+  (DB.examenes || []).forEach(function (x) { if (x.calificacion != null) valores.push(Number(x.calificacion)); });
+  valores = valores.filter(function (v) { return !isNaN(v); });
+  if (valores.length && Math.max.apply(null, valores) <= 10) {
+    (DB.notas || []).forEach(function (n) { n.calificacion = redondear(Number(n.calificacion) * 10, 2); });
+    (DB.tareas || []).forEach(function (t) { if (t.calificacion != null) t.calificacion = redondear(Number(t.calificacion) * 10, 2); });
+    (DB.examenes || []).forEach(function (x) { if (x.calificacion != null) x.calificacion = redondear(Number(x.calificacion) * 10, 2); });
+  }
+  DB.escala = NOTA_MAXIMA;
+  guardar();
+}
+function guardar() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); }
+  catch (e) { toast('No se pudieron guardar los datos', 'error'); }
+}
+function nuevoId(lista) {
+  return lista.reduce(function (m, x) { return Math.max(m, x.id); }, 0) + 1;
+}
+function buscar(lista, id) {
+  for (var i = 0; i < lista.length; i++) if (lista[i].id === id) return lista[i];
+  return null;
+}
+function nombreMateria(id) { var m = buscar(DB.materias, id); return m ? m.nombre : '—'; }
+function nombreEstudiante(id) { var e = buscar(DB.estudiantes, id); return e ? e.apellidos + ', ' + e.nombres : '—'; }
+
+/* ----------------------------------------------------------- Login ---- */
+/* -------------------------------------------- Sesión recordada ---- */
+function entrarAlPanel() {
+  $('#vista-login').classList.add('oculto');
+  $('#app').classList.remove('oculto');
+  iniciar();
+}
+function guardarSesion(email) {
+  var recordar = $('#recordar') ? $('#recordar').checked : true;
+  var store = recordar ? localStorage : sessionStorage;
+  store.setItem(SESION_KEY, JSON.stringify({ email: email, fecha: new Date().toISOString() }));
+}
+function leerSesion() {
+  var raw = localStorage.getItem(SESION_KEY) || sessionStorage.getItem(SESION_KEY);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+function borrarSesion() {
+  localStorage.removeItem(SESION_KEY);
+  sessionStorage.removeItem(SESION_KEY);
+}
+
+$('#form-login').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var email = $('#email').value.trim().toLowerCase();
+  var pass = $('#password').value;
+  if (email === 'admin@pisac.edu' && pass === 'admin123') {
+    guardarSesion(email);
+    entrarAlPanel();
+  } else {
+    var e = $('#login-error');
+    e.textContent = 'Credenciales incorrectas. Usa admin@pisac.edu / admin123';
+    e.classList.remove('oculto');
+  }
+});
+
+$('#btn-salir').addEventListener('click', function () {
+  borrarSesion();
+  $('#app').classList.add('oculto');
+  $('#vista-login').classList.remove('oculto');
+  $('#login-error').classList.add('oculto');
+});
+
+/* ------------------------------------------------------- Navegación ---- */
+var vistas = ['inicio','estudiantes','materias','notas','tareas','examenes','asistencia','notificaciones'];
+function mostrarVista(nombre) {
+  vistas.forEach(function (v) { $('#vista-' + v).classList.toggle('oculto', v !== nombre); });
+  $$('#nav button').forEach(function (b) { b.classList.toggle('activo', b.dataset.vista === nombre); });
+}
+$$('#nav button').forEach(function (b) {
+  b.addEventListener('click', function () { mostrarVista(b.dataset.vista); });
+});
+
+/* ------------------------------------------------------- Inicializar -- */
+function iniciar() {
+  cargar();
+  llenarSelectores();
+  $('#prof-leyenda').textContent = textoLeyenda();
+  renderTodo();
+}
+
+function opcionesEstudiantes(sel, vacio) {
+  var previo = sel.value;
+  var html = vacio ? '<option value="">' + vacio + '</option>' : '';
+  html += DB.estudiantes.slice().sort(function (a, b) {
+    return (a.apellidos + a.nombres).localeCompare(b.apellidos + b.nombres);
+  }).map(function (e) {
+    return '<option value="' + e.id + '">' + escapar(e.apellidos + ', ' + e.nombres + ' · ' + e.curso) + '</option>';
+  }).join('');
+  sel.innerHTML = html;
+  if (previo) sel.value = previo;
+}
+function opcionesMaterias(sel) {
+  var previo = sel.value;
+  sel.innerHTML = DB.materias.map(function (m) {
+    return '<option value="' + m.id + '">' + escapar(m.nombre) + '</option>';
+  }).join('');
+  if (previo) sel.value = previo;
+}
+function llenarSelectores() {
+  ['#nota-estudiante','#tarea-estudiante','#exam-estudiante','#asis-estudiante','#noti-estudiante'].forEach(function (s) {
+    opcionesEstudiantes($(s), null);
+  });
+  ['#filtro-notas','#filtro-tareas','#filtro-examenes','#filtro-asistencia'].forEach(function (s) {
+    opcionesEstudiantes($(s), 'Todos los estudiantes');
+  });
+  ['#nota-materia','#tarea-materia','#exam-materia'].forEach(function (s) { opcionesMaterias($(s)); });
+}
+
+function renderTodo() {
+  renderInicio(); renderEstudiantes(); renderMaterias(); renderNotas();
+  renderTareas(); renderExamenes(); renderAsistencia(); renderNotificaciones();
+}
+
+/* --------------------------------------------------- Cálculo reporte -- */
+function construirReporte(estudianteId) {
+  var est = buscar(DB.estudiantes, estudianteId);
+  if (!est) return null;
+
+  var notas = DB.notas.filter(function (n) { return n.estudiante_id === estudianteId; })
+    .map(function (n) { return Object.assign({}, n, { materia: nombreMateria(n.materia_id) }); })
+    .sort(function (a, b) { return a.materia.localeCompare(b.materia); });
+
+  var tareas = DB.tareas.filter(function (t) { return t.estudiante_id === estudianteId; })
+    .map(function (t) { return Object.assign({}, t, { materia: nombreMateria(t.materia_id) }); });
+
+  var examenes = DB.examenes.filter(function (x) { return x.estudiante_id === estudianteId; })
+    .map(function (x) { return Object.assign({}, x, { materia: nombreMateria(x.materia_id) }); })
+    .sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+
+  var asistencia = DB.asistencia.filter(function (a) { return a.estudiante_id === estudianteId; })
+    .sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+
+  var promedio = notas.length
+    ? redondear(notas.reduce(function (s, n) { return s + Number(n.calificacion); }, 0) / notas.length)
+    : null;
+
+  var mapa = {};
+  notas.forEach(function (n) {
+    if (!mapa[n.materia]) mapa[n.materia] = [];
+    mapa[n.materia].push(Number(n.calificacion));
+  });
+  var resumenMaterias = Object.keys(mapa).map(function (mat) {
+    var vals = mapa[mat];
+    var prom = redondear(vals.reduce(function (a, b) { return a + b; }, 0) / vals.length);
+    return { materia: mat, promedio: prom, cantidad: vals.length, enRiesgo: prom < NOTA_APROBATORIA };
+  }).sort(function (a, b) { return a.promedio - b.promedio; });
+
+  var conteo = { presente: 0, ausente: 0, tarde: 0, justificado: 0 };
+  asistencia.forEach(function (a) { if (conteo[a.estado] !== undefined) conteo[a.estado]++; });
+  var total = asistencia.length;
+  var porcAsist = total ? redondear(((conteo.presente + conteo.tarde) / total) * 100, 1) : null;
+
+  var materiasEnRiesgo = resumenMaterias.filter(function (m) { return m.enRiesgo; }).map(function (m) { return m.materia; });
+
+  return {
+    estudiante: est,
+    resumen: {
+      promedioGeneral: promedio,
+      enRiesgo: promedio !== null && promedio < NOTA_APROBATORIA,
+      materiasEnRiesgo: materiasEnRiesgo,
+      tareasPendientes: tareas.filter(function (t) { return t.estado === 'pendiente'; }).length,
+      tareasAtrasadas: tareas.filter(function (t) { return t.estado === 'atrasada'; }).length,
+      totalTareas: tareas.length,
+      totalExamenes: examenes.length,
+      porcentajeAsistencia: porcAsist,
+      asistencia: Object.assign({ total: total }, conteo)
+    },
+    resumenMaterias: resumenMaterias,
+    notas: notas, tareas: tareas, examenes: examenes, asistencia: asistencia
+  };
+}
+
+/* ------------------------------------------------------------ INICIO -- */
+function renderInicio() {
+  var reportes = DB.estudiantes.map(function (e) { return construirReporte(e.id); });
+  var conProm = reportes.filter(function (r) { return r.resumen.promedioGeneral !== null; });
+  var promInst = conProm.length
+    ? redondear(conProm.reduce(function (s, r) { return s + r.resumen.promedioGeneral; }, 0) / conProm.length)
+    : '—';
+  var enRiesgo = reportes.filter(function (r) { return r.resumen.enRiesgo; });
+  var totalMatRiesgo = reportes.reduce(function (s, r) { return s + r.resumen.materiasEnRiesgo.length; }, 0);
+
+  $('#tarjetas-resumen').innerHTML =
+    tarjeta('Estudiantes', DB.estudiantes.length, 'registrados en el sistema', '') +
+    tarjeta('Promedio institucional', promInst, 'sobre ' + NOTA_MAXIMA + ' puntos', 'verde') +
+    tarjeta('Estudiantes en riesgo', enRiesgo.length, 'promedio < ' + NOTA_APROBATORIA, 'rojo') +
+    tarjeta('Materias con bajo rendimiento', totalMatRiesgo, 'casos detectados', 'ambar') +
+    tarjeta('Materias', DB.materias.length, 'en el catálogo', '');
+
+  var tb = $('#tabla-riesgo');
+  if (!enRiesgo.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="vacio">No hay estudiantes con bajo rendimiento. 🎉</td></tr>';
+    return;
+  }
+  tb.innerHTML = enRiesgo.sort(function (a, b) {
+    return a.resumen.promedioGeneral - b.resumen.promedioGeneral;
+  }).map(function (r) {
+    var e = r.estudiante;
+    return '<tr><td>' + escapar(e.nombres + ' ' + e.apellidos) + '</td><td>' + escapar(e.curso) +
+      '</td><td><strong>' + r.resumen.promedioGeneral + '</strong> / ' + NOTA_MAXIMA + '</td><td>' +
+      escapar(e.tutor_nombre) + '</td><td><span class="badge badge-rojo">Requiere atención</span></td></tr>';
+  }).join('');
+}
+function tarjeta(etiqueta, valor, detalle, color) {
+  return '<div class="tarjeta ' + (color || '') + '"><div class="etiqueta">' + etiqueta +
+    '</div><div class="valor">' + valor + '</div><div class="detalle">' + detalle + '</div></div>';
+}
+
+/* ------------------------------------------------------- ESTUDIANTES -- */
+function renderEstudiantes() {
+  var tb = $('#tabla-estudiantes');
+  if (!DB.estudiantes.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="vacio">Aún no hay estudiantes registrados.</td></tr>';
+    return;
+  }
+  tb.innerHTML = DB.estudiantes.map(function (e) {
+    return '<tr><td>' + escapar(e.nombres + ' ' + e.apellidos) + '</td><td>' + escapar(e.curso) +
+      '</td><td>' + escapar(e.tutor_nombre) + '</td><td>' + escapar(e.tutor_telefono) +
+      '</td><td><button class="btn btn-sec btn-mini" data-editar="' + e.id + '">Editar</button> ' +
+      '<button class="btn btn-rojo btn-mini" data-eliminar="' + e.id + '">Eliminar</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-editar]').forEach(function (b) {
+    b.addEventListener('click', function () { editarEstudiante(Number(b.dataset.editar)); });
+  });
+  tb.querySelectorAll('[data-eliminar]').forEach(function (b) {
+    b.addEventListener('click', function () { eliminarEstudiante(Number(b.dataset.eliminar)); });
+  });
+}
+function editarEstudiante(id) {
+  var e = buscar(DB.estudiantes, id);
+  if (!e) return;
+  $('#est-id').value = e.id;
+  $('#est-nombres').value = e.nombres;
+  $('#est-apellidos').value = e.apellidos;
+  $('#est-curso').value = e.curso;
+  $('#est-tutor').value = e.tutor_nombre;
+  $('#est-telefono').value = e.tutor_telefono;
+  $('#titulo-form-estudiante').textContent = 'Editar estudiante';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function limpiarFormEstudiante() {
+  $('#form-estudiante').reset();
+  $('#est-id').value = '';
+  $('#titulo-form-estudiante').textContent = 'Nuevo estudiante';
+}
+$('#btn-cancelar-estudiante').addEventListener('click', limpiarFormEstudiante);
+$('#form-estudiante').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var id = $('#est-id').value;
+  var datos = {
+    nombres: $('#est-nombres').value.trim(),
+    apellidos: $('#est-apellidos').value.trim(),
+    curso: $('#est-curso').value.trim(),
+    tutor_nombre: $('#est-tutor').value.trim(),
+    tutor_telefono: $('#est-telefono').value.trim()
+  };
+  if (id) {
+    Object.assign(buscar(DB.estudiantes, Number(id)), datos);
+    toast('Estudiante actualizado', 'ok');
+  } else {
+    datos.id = nuevoId(DB.estudiantes);
+    DB.estudiantes.push(datos);
+    toast('Estudiante registrado', 'ok');
+  }
+  guardar(); limpiarFormEstudiante(); llenarSelectores(); renderTodo();
+});
+function eliminarEstudiante(id) {
+  if (!confirm('¿Eliminar este estudiante y todos sus registros?')) return;
+  DB.estudiantes = DB.estudiantes.filter(function (e) { return e.id !== id; });
+  DB.notas = DB.notas.filter(function (n) { return n.estudiante_id !== id; });
+  DB.tareas = DB.tareas.filter(function (t) { return t.estudiante_id !== id; });
+  DB.examenes = DB.examenes.filter(function (x) { return x.estudiante_id !== id; });
+  DB.asistencia = DB.asistencia.filter(function (a) { return a.estudiante_id !== id; });
+  DB.notificaciones = DB.notificaciones.filter(function (n) { return n.estudiante_id !== id; });
+  guardar(); toast('Estudiante eliminado', 'ok'); llenarSelectores(); renderTodo();
+}
+
+/* ----------------------------------------------------------- MATERIAS -- */
+function renderMaterias() {
+  var tb = $('#tabla-materias');
+  if (!DB.materias.length) {
+    tb.innerHTML = '<tr><td colspan="3" class="vacio">Aún no hay materias.</td></tr>';
+    return;
+  }
+  tb.innerHTML = DB.materias.map(function (m) {
+    return '<tr><td>' + escapar(m.nombre) + '</td><td>' + escapar(m.docente || '—') +
+      '</td><td><button class="btn btn-rojo btn-mini" data-eliminar="' + m.id + '">Eliminar</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-eliminar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!confirm('¿Eliminar la materia? Se borrarán sus notas, tareas y exámenes.')) return;
+      var id = Number(b.dataset.eliminar);
+      DB.materias = DB.materias.filter(function (m) { return m.id !== id; });
+      DB.notas = DB.notas.filter(function (n) { return n.materia_id !== id; });
+      DB.tareas = DB.tareas.filter(function (t) { return t.materia_id !== id; });
+      DB.examenes = DB.examenes.filter(function (x) { return x.materia_id !== id; });
+      guardar(); toast('Materia eliminada', 'ok'); llenarSelectores(); renderTodo();
+    });
+  });
+}
+$('#form-materia').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var nombre = $('#mat-nombre').value.trim();
+  if (DB.materias.some(function (m) { return m.nombre.toLowerCase() === nombre.toLowerCase(); })) {
+    toast('Ya existe una materia con ese nombre', 'error'); return;
+  }
+  DB.materias.push({ id: nuevoId(DB.materias), nombre: nombre, docente: $('#mat-docente').value.trim() });
+  guardar(); $('#form-materia').reset(); toast('Materia agregada', 'ok');
+  llenarSelectores(); renderTodo();
+});
+
+/* -------------------------------------------------------------- NOTAS -- */
+function nivelCualitativo(v) {
+  if (v === null || v === undefined || isNaN(Number(v))) return { etiqueta: '—', clase: 'badge-gris', color: '' };
+  v = Number(v);
+  if (v >= NIVEL_EXCELENTE) return { etiqueta: 'Excelente', clase: 'badge-verde', color: 'verde' };
+  if (v >= NIVEL_BUENO) return { etiqueta: 'Bueno', clase: 'badge-azul', color: 'verde' };
+  if (v >= NOTA_APROBATORIA) return { etiqueta: 'Regular', clase: 'badge-ambar', color: 'ambar' };
+  return { etiqueta: 'Insuficiente', clase: 'badge-rojo', color: 'rojo' };
+}
+function badgeNivel(v) {
+  var n = nivelCualitativo(v);
+  return '<span class="badge ' + n.clase + '">' + n.etiqueta + '</span>';
+}
+function textoLeyenda() {
+  return 'Escala de calificación: 0–' + (NOTA_APROBATORIA - 1) + ' Insuficiente · ' + NOTA_APROBATORIA + '–' + (NIVEL_BUENO - 1) +
+    ' Regular · ' + NIVEL_BUENO + '–' + (NIVEL_EXCELENTE - 1) + ' Bueno · ' + NIVEL_EXCELENTE + '–' + NOTA_MAXIMA + ' Excelente';
+}
+function badgeNota(v) {
+  var n = nivelCualitativo(v);
+  return '<span class="badge ' + n.clase + '">' + v + ' / ' + NOTA_MAXIMA + '</span>';
+}
+function renderNotas() {
+  var f = $('#filtro-notas').value;
+  var filas = DB.notas.filter(function (n) { return !f || n.estudiante_id === Number(f); })
+    .sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+  var tb = $('#tabla-notas');
+  if (!filas.length) { tb.innerHTML = '<tr><td colspan="8" class="vacio">No hay notas registradas.</td></tr>'; return; }
+  tb.innerHTML = filas.map(function (n) {
+    return '<tr><td>' + escapar(nombreEstudiante(n.estudiante_id)) + '</td><td>' + escapar(nombreMateria(n.materia_id)) +
+      '</td><td>' + escapar(n.periodo) + '</td><td>' + badgeNota(n.calificacion) + '</td><td>' + badgeNivel(n.calificacion) +
+      '</td><td>' + formatearFecha(n.fecha) +
+      '</td><td>' + escapar(n.observacion || '—') + '</td><td><button class="btn btn-rojo btn-mini" data-eliminar="' + n.id + '">Eliminar</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-eliminar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!confirm('¿Eliminar esta nota?')) return;
+      DB.notas = DB.notas.filter(function (n) { return n.id !== Number(b.dataset.eliminar); });
+      guardar(); toast('Nota eliminada', 'ok'); renderTodo();
+    });
+  });
+}
+$('#filtro-notas').addEventListener('change', renderNotas);
+$('#form-nota').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  DB.notas.push({
+    id: nuevoId(DB.notas),
+    estudiante_id: Number($('#nota-estudiante').value),
+    materia_id: Number($('#nota-materia').value),
+    periodo: $('#nota-periodo').value.trim(),
+    calificacion: Number($('#nota-calificacion').value),
+    observacion: $('#nota-observacion').value.trim(),
+    fecha: $('#nota-fecha').value || hoyISO()
+  });
+  guardar(); $('#form-nota').reset(); toast('Nota guardada', 'ok'); renderTodo();
+});
+
+/* ------------------------------------------------------------- TAREAS -- */
+function badgeEstado(e) {
+  var mapa = { pendiente: 'badge-ambar', entregada: 'badge-verde', atrasada: 'badge-rojo' };
+  return '<span class="badge ' + (mapa[e] || 'badge-gris') + '">' + escapar(e) + '</span>';
+}
+function renderTareas() {
+  var f = $('#filtro-tareas').value;
+  var filas = DB.tareas.filter(function (t) { return !f || t.estudiante_id === Number(f); });
+  var tb = $('#tabla-tareas');
+  if (!filas.length) { tb.innerHTML = '<tr><td colspan="7" class="vacio">No hay tareas registradas.</td></tr>'; return; }
+  tb.innerHTML = filas.map(function (t) {
+    return '<tr><td>' + escapar(nombreEstudiante(t.estudiante_id)) + '</td><td>' + escapar(nombreMateria(t.materia_id)) +
+      '</td><td>' + escapar(t.titulo) + '</td><td>' + formatearFecha(t.fecha_entrega) + '</td><td>' + badgeEstado(t.estado) +
+      '</td><td>' + (t.calificacion == null ? '—' : t.calificacion) +
+      '</td><td><button class="btn btn-rojo btn-mini" data-eliminar="' + t.id + '">Eliminar</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-eliminar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!confirm('¿Eliminar esta tarea?')) return;
+      DB.tareas = DB.tareas.filter(function (t) { return t.id !== Number(b.dataset.eliminar); });
+      guardar(); toast('Tarea eliminada', 'ok'); renderTodo();
+    });
+  });
+}
+$('#filtro-tareas').addEventListener('change', renderTareas);
+$('#form-tarea').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var cal = $('#tarea-calificacion').value;
+  DB.tareas.push({
+    id: nuevoId(DB.tareas),
+    estudiante_id: Number($('#tarea-estudiante').value),
+    materia_id: Number($('#tarea-materia').value),
+    titulo: $('#tarea-titulo').value.trim(),
+    descripcion: $('#tarea-descripcion').value.trim(),
+    fecha_entrega: $('#tarea-fecha').value || null,
+    estado: $('#tarea-estado').value,
+    calificacion: cal === '' ? null : Number(cal)
+  });
+  guardar(); $('#form-tarea').reset(); toast('Tarea guardada', 'ok'); renderTodo();
+});
+
+/* ----------------------------------------------------------- EXÁMENES -- */
+function renderExamenes() {
+  var f = $('#filtro-examenes').value;
+  var filas = DB.examenes.filter(function (x) { return !f || x.estudiante_id === Number(f); });
+  var tb = $('#tabla-examenes');
+  if (!filas.length) { tb.innerHTML = '<tr><td colspan="6" class="vacio">No hay exámenes registrados.</td></tr>'; return; }
+  tb.innerHTML = filas.map(function (x) {
+    return '<tr><td>' + escapar(nombreEstudiante(x.estudiante_id)) + '</td><td>' + escapar(nombreMateria(x.materia_id)) +
+      '</td><td>' + escapar(x.titulo) + '</td><td>' + formatearFecha(x.fecha) + '</td><td>' +
+      (x.calificacion == null ? '—' : badgeNota(x.calificacion)) +
+      '</td><td><button class="btn btn-rojo btn-mini" data-eliminar="' + x.id + '">Eliminar</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-eliminar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!confirm('¿Eliminar este examen?')) return;
+      DB.examenes = DB.examenes.filter(function (x) { return x.id !== Number(b.dataset.eliminar); });
+      guardar(); toast('Examen eliminado', 'ok'); renderTodo();
+    });
+  });
+}
+$('#filtro-examenes').addEventListener('change', renderExamenes);
+$('#form-examen').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var cal = $('#exam-calificacion').value;
+  DB.examenes.push({
+    id: nuevoId(DB.examenes),
+    estudiante_id: Number($('#exam-estudiante').value),
+    materia_id: Number($('#exam-materia').value),
+    titulo: $('#exam-titulo').value.trim(),
+    fecha: $('#exam-fecha').value || null,
+    calificacion: cal === '' ? null : Number(cal)
+  });
+  guardar(); $('#form-examen').reset(); toast('Examen guardado', 'ok'); renderTodo();
+});
+
+/* --------------------------------------------------------- ASISTENCIA -- */
+function badgeAsistencia(e) {
+  var mapa = { presente: 'badge-verde', ausente: 'badge-rojo', tarde: 'badge-ambar', justificado: 'badge-azul' };
+  return '<span class="badge ' + (mapa[e] || 'badge-gris') + '">' + escapar(e) + '</span>';
+}
+function renderAsistencia() {
+  var f = $('#filtro-asistencia').value;
+  var filas = DB.asistencia.filter(function (a) { return !f || a.estudiante_id === Number(f); })
+    .sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+  var tb = $('#tabla-asistencia');
+  if (!filas.length) { tb.innerHTML = '<tr><td colspan="5" class="vacio">No hay registros de asistencia.</td></tr>'; return; }
+  tb.innerHTML = filas.map(function (a) {
+    return '<tr><td>' + escapar(nombreEstudiante(a.estudiante_id)) + '</td><td>' + formatearFecha(a.fecha) +
+      '</td><td>' + badgeAsistencia(a.estado) + '</td><td>' + escapar(a.observacion || '—') +
+      '</td><td><button class="btn btn-rojo btn-mini" data-eliminar="' + a.id + '">Eliminar</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-eliminar]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!confirm('¿Eliminar este registro?')) return;
+      DB.asistencia = DB.asistencia.filter(function (a) { return a.id !== Number(b.dataset.eliminar); });
+      guardar(); toast('Registro eliminado', 'ok'); renderTodo();
+    });
+  });
+}
+$('#filtro-asistencia').addEventListener('change', renderAsistencia);
+$('#form-asistencia').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  DB.asistencia.push({
+    id: nuevoId(DB.asistencia),
+    estudiante_id: Number($('#asis-estudiante').value),
+    fecha: $('#asis-fecha').value,
+    estado: $('#asis-estado').value,
+    observacion: $('#asis-observacion').value.trim()
+  });
+  guardar(); $('#form-asistencia').reset(); toast('Asistencia registrada', 'ok'); renderTodo();
+});
+
+/* ----------------------------------------------------- NOTIFICACIONES -- */
+function limpiarTel(t) { return String(t || '').replace(/[^0-9]/g, ''); }
+
+function mensajePredeterminado(r, extra) {
+  var e = r.estudiante, s = r.resumen;
+  var prom = s.promedioGeneral === null ? 'sin registros' : s.promedioGeneral + '/' + NOTA_MAXIMA;
+  var asis = s.porcentajeAsistencia === null ? 'sin registros' : s.porcentajeAsistencia + '%';
+  var partes = [
+    'Estimado/a ' + e.tutor_nombre + ', le escribimos de la institución educativa para informarle el seguimiento académico de ' + e.nombres + ' ' + e.apellidos + ' (' + e.curso + ').',
+    'Promedio general: ' + prom + '.',
+    'Asistencia: ' + asis + '.'
+  ];
+  if (s.materiasEnRiesgo.length) partes.push('Materias con bajo rendimiento: ' + s.materiasEnRiesgo.join(', ') + '.');
+  if (s.tareasPendientes || s.tareasAtrasadas) partes.push('Tareas: ' + s.tareasPendientes + ' pendientes y ' + s.tareasAtrasadas + ' atrasadas.');
+  if (extra) partes.push(extra);
+  return partes.join(' ');
+}
+
+var ULTIMA_NOTI = null;
+
+$('#form-notificacion').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  var id = Number($('#noti-estudiante').value);
+  var r = construirReporte(id);
+  if (!r) { toast('Estudiante no encontrado', 'error'); return; }
+  var token = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+  var mensaje = mensajePredeterminado(r, $('#noti-mensaje').value.trim());
+  var registro = { id: nuevoId(DB.notificaciones), estudiante_id: id, token: token, mensaje: mensaje, fecha: new Date().toISOString() };
+  DB.notificaciones.push(registro);
+  guardar();
+  ULTIMA_NOTI = registro;
+
+  var enlace = 'https://pisac.app/s/' + token;
+  var wa = 'https://wa.me/' + limpiarTel(r.estudiante.tutor_telefono) + '?text=' + encodeURIComponent(mensaje + ' Ver detalle: ' + enlace);
+
+  $('#noti-resultado').classList.remove('oculto');
+  $('#noti-texto').textContent = mensaje;
+  $('#noti-enlace').textContent = 'Enlace simulado del tutor: ' + enlace;
+  $('#noti-whatsapp').href = wa;
+  toast('Enlace generado. Listo para enviar por WhatsApp.', 'ok');
+  renderNotificaciones(); renderInicio();
+});
+
+$('#noti-copiar').addEventListener('click', function () {
+  var texto = $('#noti-texto').textContent + ' Ver detalle: ' + (ULTIMA_NOTI ? 'https://pisac.app/s/' + ULTIMA_NOTI.token : '');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(texto).then(function () { toast('Mensaje copiado', 'ok'); })
+      .catch(function () { toast('No se pudo copiar', 'error'); });
+  } else {
+    toast('Copia manualmente el mensaje', 'error');
+  }
+});
+
+$('#noti-ver').addEventListener('click', function () {
+  if (ULTIMA_NOTI) abrirReporte(ULTIMA_NOTI.estudiante_id, ULTIMA_NOTI.mensaje);
+});
+
+function renderNotificaciones() {
+  var tb = $('#tabla-notificaciones');
+  var lista = DB.notificaciones.slice().sort(function (a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+  if (!lista.length) { tb.innerHTML = '<tr><td colspan="4" class="vacio">Aún no se han enviado notificaciones.</td></tr>'; return; }
+  tb.innerHTML = lista.map(function (n) {
+    var e = buscar(DB.estudiantes, n.estudiante_id) || {};
+    return '<tr><td>' + formatearFechaHora(n.fecha) + '</td><td>' + escapar(nombreEstudiante(n.estudiante_id)) +
+      '</td><td>' + escapar(e.tutor_nombre || '—') + '<br><small style="color:var(--gris-500)">' + escapar(e.tutor_telefono || '') +
+      '</small></td><td><button class="btn btn-mini" data-ver="' + n.id + '">Ver reporte</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('[data-ver]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var n = DB.notificaciones.filter(function (x) { return x.id === Number(b.dataset.ver); })[0];
+      if (n) abrirReporte(n.estudiante_id, n.mensaje);
+    });
+  });
+}
+
+/* ----------------------------------------------------- VISTA DEL TUTOR */
+function abrirReporte(estudianteId, mensaje) {
+  var d = construirReporte(estudianteId);
+  if (!d) return;
+  var e = d.estudiante, r = d.resumen;
+
+  $('#tutor-nombre').textContent = e.nombres + ' ' + e.apellidos;
+  $('#tutor-tutor').textContent = 'Tutor: ' + e.tutor_nombre;
+  $('#tutor-curso').textContent = e.curso;
+
+  var aviso = $('#tutor-aviso');
+  if (r.promedioGeneral === null) {
+    aviso.innerHTML = '<div class="aviso-bien">Todavía no se han registrado calificaciones para este estudiante.</div>';
+  } else if (r.enRiesgo) {
+    aviso.innerHTML = '<div class="aviso-riesgo"><strong>Atención:</strong> el promedio general (' + r.promedioGeneral + '/' + NOTA_MAXIMA +
+      ') está por debajo de la nota aprobatoria (' + NOTA_APROBATORIA + '). ' +
+      (r.materiasEnRiesgo.length ? 'Materias que requieren refuerzo: ' + escapar(r.materiasEnRiesgo.join(', ')) + '.' : '') + '</div>';
+  } else if (r.promedioGeneral < NIVEL_BUENO) {
+    aviso.innerHTML = '<div class="aviso-ambar"><strong>Nivel Regular:</strong> el promedio general (' + r.promedioGeneral + '/' + NOTA_MAXIMA +
+      ') aprueba, pero se encuentra en un nivel <strong>Regular</strong>. Se recomienda reforzar las materias con menor puntaje.</div>';
+  } else {
+    aviso.innerHTML = '<div class="aviso-bien"><strong>Buen desempeño:</strong> el promedio general (' + r.promedioGeneral + '/' + NOTA_MAXIMA +
+      ') se encuentra en un nivel <strong>' + nivelCualitativo(r.promedioGeneral).etiqueta + '</strong>.</div>';
+  }
+
+  var mp = $('#tutor-mensaje');
+  if (mensaje) { mp.classList.remove('oculto'); mp.innerHTML = '<strong>Mensaje del docente:</strong> ' + escapar(mensaje); }
+  else { mp.classList.add('oculto'); }
+
+  $('#tutor-tarjetas').innerHTML =
+    tarjeta('Promedio general', (r.promedioGeneral === null ? '—' : r.promedioGeneral + ' / ' + NOTA_MAXIMA),
+      (r.promedioGeneral === null ? 'sin calificaciones' : 'Nivel: ' + nivelCualitativo(r.promedioGeneral).etiqueta),
+      (r.promedioGeneral === null ? '' : nivelCualitativo(r.promedioGeneral).color)) +
+    tarjeta('Asistencia', (r.porcentajeAsistencia === null ? '—' : r.porcentajeAsistencia + '%'),
+      r.asistencia.presente + ' presentes · ' + r.asistencia.ausente + ' ausencias',
+      (r.porcentajeAsistencia !== null && r.porcentajeAsistencia >= 85) ? 'verde' : 'ambar') +
+    tarjeta('Tareas pendientes', r.tareasPendientes, r.tareasAtrasadas + ' atrasadas de ' + r.totalTareas, r.tareasAtrasadas ? 'rojo' : 'verde') +
+    tarjeta('Exámenes', r.totalExamenes, 'evaluaciones registradas', '');
+
+  $('#tutor-materias').innerHTML = d.resumenMaterias.length ? d.resumenMaterias.map(function (m) {
+    var pct = Math.max(0, Math.min(100, (m.promedio / NOTA_MAXIMA) * 100));
+    var color = m.promedio >= NOTA_APROBATORIA ? 'verde' : (m.promedio >= NOTA_APROBATORIA - (NOTA_MAXIMA * 0.1) ? 'ambar' : 'rojo');
+    return '<tr><td>' + escapar(m.materia) + '</td><td><strong>' + m.promedio + '</strong> / ' + NOTA_MAXIMA +
+      '</td><td><div class="barra ' + color + '"><span style="width:' + pct + '%"></span></div></td><td>' + m.cantidad +
+      '</td><td>' + badgeNivel(m.promedio) + '</td></tr>';
+  }).join('') : '<tr><td colspan="5" class="vacio">Sin calificaciones registradas.</td></tr>';
+
+  $('#tutor-notas').innerHTML = d.notas.length ? d.notas.map(function (n) {
+    return '<tr><td>' + escapar(n.materia) + '</td><td>' + escapar(n.periodo) + '</td><td>' + badgeNota(n.calificacion) +
+      '</td><td>' + badgeNivel(n.calificacion) + '</td><td>' + formatearFecha(n.fecha) + '</td><td>' + escapar(n.observacion || '—') + '</td></tr>';
+  }).join('') : '<tr><td colspan="6" class="vacio">Sin notas registradas.</td></tr>';
+
+  $('#tutor-tareas').innerHTML = d.tareas.length ? d.tareas.map(function (t) {
+    return '<tr><td>' + escapar(t.materia) + '</td><td>' + escapar(t.titulo) + '</td><td>' + formatearFecha(t.fecha_entrega) +
+      '</td><td>' + badgeEstado(t.estado) + '</td><td>' + (t.calificacion == null ? '—' : t.calificacion) + '</td></tr>';
+  }).join('') : '<tr><td colspan="5" class="vacio">Sin tareas registradas.</td></tr>';
+
+  $('#tutor-examenes').innerHTML = d.examenes.length ? d.examenes.map(function (x) {
+    return '<tr><td>' + escapar(x.materia) + '</td><td>' + escapar(x.titulo) + '</td><td>' + formatearFecha(x.fecha) +
+      '</td><td>' + (x.calificacion == null ? '—' : badgeNota(x.calificacion)) + '</td></tr>';
+  }).join('') : '<tr><td colspan="4" class="vacio">Sin exámenes registrados.</td></tr>';
+
+  $('#tutor-asistencia').innerHTML = d.asistencia.length ? d.asistencia.map(function (a) {
+    return '<tr><td>' + formatearFecha(a.fecha) + '</td><td>' + badgeAsistencia(a.estado) + '</td><td>' + escapar(a.observacion || '—') + '</td></tr>';
+  }).join('') : '<tr><td colspan="3" class="vacio">Sin registros de asistencia.</td></tr>';
+
+  $('#tutor-leyenda').textContent = textoLeyenda();
+  $('#vista-tutor').classList.remove('oculto');
+  window.scrollTo(0, 0);
+}
+
+$('#tutor-volver').addEventListener('click', function () { $('#vista-tutor').classList.add('oculto'); });
+$('#tutor-imprimir').addEventListener('click', function () { window.print(); });
+
+/* --------------------------------------------- Herramientas de demo --- */
+$('#btn-ejemplo').addEventListener('click', function () {
+  if (!confirm('Esto reemplazará los datos actuales por los datos de ejemplo. ¿Continuar?')) return;
+  DB = datosIniciales(); guardar(); llenarSelectores(); renderTodo();
+  toast('Datos de ejemplo cargados', 'ok');
+});
+$('#btn-borrar').addEventListener('click', function () {
+  if (!confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
+  DB = { estudiantes: [], materias: [], notas: [], tareas: [], examenes: [], asistencia: [], notificaciones: [] };
+  guardar(); llenarSelectores(); renderTodo();
+  toast('Todos los datos fueron borrados', 'ok');
+});
+
+/* ------------------------------------------------------------- Inicio -- */
+cargar();
+if (leerSesion()) {
+  entrarAlPanel();
+}
+</script>
+</body>
+</html>

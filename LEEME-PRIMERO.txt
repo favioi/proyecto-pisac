@@ -1,0 +1,23 @@
+PISAC - LISTO PARA USAR (Google ya configurado)
+==============================================
+
+1. Abre la carpeta  PISAC
+2. Doble clic en  INICIAR-PISAC.bat
+3. Se abre el navegador en  http://localhost:3000
+4. Entra con el boton de Google, o con "Entrar al panel"
+
+Tu Client ID de Google ya viene guardado en data\config.json:
+no tienes que pegarlo otra vez.
+
+NO hace falta ejecutar npm install.
+
+SI LA VENTANA SE CIERRA
+-----------------------
+- Prueba ABRIR-PISAC.vbs (doble clic).
+- O ejecuta DIAGNOSTICO.bat y me mandas diagnostico.txt.
+
+ENLACES PARA EL CELULAR
+-----------------------
+- Celular en el mismo Wi-Fi: funciona solo.
+- Datos moviles u otra red: hace falta una direccion publica
+  (tunel o publicar en Render). Se pega una vez en Ajustes y queda guardada.
